@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قراءة باركود - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- مكتبة مسح الباركود عبر الكاميرا -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.10/html5-qrcode.min.js"></script>
+    <!-- مكتبة احتياطية لمسح QR من الصور -->
+    <script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.legacy.min.js"></script>
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'read-barcode', user: user}) %>
+    
+    <div class="dashboard">
+        <div class="container py-3">
+            <div class="dashboard-header mb-4">
+                <h1 class="h3 mb-1">قراءة الباركود المشفر</h1>
+                <p class="mb-0">قم بقراءة الباركود للتحقق من صحة الوثيقة</p>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h3 class="h5 mb-0">مسح الباركود</h3>
+                </div>
+                <div class="card-body">
+                    <!-- واجهة المسح بالكاميرا -->
+                    <div class="form-group mb-3">
+                        <label class="form-label">المسح عبر الكاميرا</label>
+                        <div class="d-flex justify-content-center">
+                          <div id="qr-reader" class="w-100" style="max-width: 480px;"></div>
+                        </div>
+                        <!-- حاوية منفصلة لمسح الصور (تجنّب التعارض مع جلسة الكاميرا) -->
+                        <div id="qr-reader-file" style="display:none;"></div>
+                        <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 mt-2">
+                            <select id="cameraSelect" class="form-select" style="min-width: 220px;"></select>
+                            <button id="startScanBtn" type="button" class="btn btn-secondary">بدء المسح</button>
+                            <button id="stopScanBtn" type="button" class="btn btn-outline-secondary">إيقاف</button>
+                            <button id="retryBtn" type="button" class="btn btn-outline-secondary">إعادة المحاولة</button>
+                        </div>
+                        <div id="scanStatus" class="alert text-center mt-2" style="display:none;"></div>
+                        <div class="text-center mt-2">
+                          <label for="qrImageInput" class="btn btn-outline-secondary" style="cursor:pointer;">مسح من صورة</label>
+                          <input id="qrImageInput" type="file" accept="image/*" style="display:none;" />
+                          <button id="scanImageBtn" type="button" class="btn btn-outline-secondary">مسح الصورة المختارة</button>
+                        </div>
+                        <div class="form-text">في حال عدم عمل الكاميرا، يمكنك اختيار صورة لرمز QR أو لصق البيانات يدوياً أدناه.</div>
+                    </div>
+
+                    <form id="readForm" action="/barcode/read" method="POST" class="mt-3">
+                        <div class="mb-3">
+                            <label for="barcodeData" class="form-label">بيانات الباركود</label>
+                            <textarea id="barcodeData" name="barcodeData" rows="6" required class="form-control"
+                                      placeholder="الصق بيانات الباركود هنا أو استخدم كاميرا الجهاز للمسح..."></textarea>
+                        </div>
+                        <button id="submitBtn" type="submit" class="btn btn-primary">قراءة الباركود</button>
+                    </form>
+
+                    <script>
+                        (function() {
+                          const startBtn = document.getElementById('startScanBtn');
+                          const stopBtn = document.getElementById('stopScanBtn');
+                          const retryBtn = document.getElementById('retryBtn');
+                          const cameraSelect = document.getElementById('cameraSelect');
+                          const textarea = document.getElementById('barcodeData');
+                          const form = document.getElementById('readForm');
+                          const statusEl = document.getElementById('scanStatus');
+                          const qrImageInput = document.getElementById('qrImageInput');
+                          const scanImageBtn = document.getElementById('scanImageBtn');
+
+                          let html5QrcodeInstance = null;
+                          let isScanning = false;
+                          let cameras = [];
+
+                          function setStatus(msg, type = 'info') {
+                            statusEl.textContent = msg;
+                            statusEl.style.display = 'block';
+                            statusEl.className = 'alert ' + (type === 'error' ? 'alert-danger' : type === 'success' ? 'alert-success' : 'alert-info');
+                          }
+
+                          function clearStatus() {
+                            statusEl.textContent = '';
+                            statusEl.style.display = 'none';
+                            statusEl.className = 'alert';
+                          }
+
+                          async function enumerateCameras() {
+                            try {
+                              // اطلب إذن الوصول للكاميرا لتحسين ظهور أسماء الأجهزة
+                              if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                                try {
+                                  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                                  // أوقف جميع المسارات فورًا، لا نحتاج البث هنا
+                                  stream.getTracks().forEach(t => t.stop());
+                                } catch (permErr) {
+                                  console.warn('Camera permission not granted yet:', permErr);
+                                }
+                              }
+
+                              cameras = await Html5Qrcode.getCameras();
+                              cameraSelect.innerHTML = '';
+                              if (!cameras || cameras.length === 0) {
+                                setStatus('لم يتم العثور على أي كاميرا على هذا الجهاز.', 'error');
+                                return;
+                              }
+                              let preferredIndex = 0;
+                              cameras.forEach((cam, index) => {
+                                const opt = document.createElement('option');
+                                opt.value = cam.id;
+                                opt.textContent = cam.label || ('كاميرا #' + (index + 1));
+                                cameraSelect.appendChild(opt);
+                                // فضّل الكاميرا الخلفية إذا وُجدت
+                                if (/back|rear|environment/i.test(cam.label)) preferredIndex = index;
+                              });
+                              cameraSelect.selectedIndex = preferredIndex;
+                            } catch (e) {
+                              console.error('Failed to enumerate cameras:', e);
+                              setStatus('تعذر الوصول إلى الكاميرات. تأكد من منح الأذونات واستخدام HTTPS على المتصفح.', 'error');
+                            }
+                          }
+
+                          async function startScanner() {
+                            if (isScanning) return;
+                            try {
+                              clearStatus();
+                              const config = { fps: 10, qrbox: { width: 280, height: 280 }, aspectRatio: 1.0, rememberLastUsedCamera: true };
+                              const selectedId = cameraSelect && cameraSelect.value ? cameraSelect.value : (cameras[0] && cameras[0].id);
+                              if (!selectedId) {
+                                setStatus('لا توجد كاميرا محددة. يرجى اختيار كاميرا ثم المحاولة.', 'error');
+                                return;
+                              }
+
+                              html5QrcodeInstance = new Html5Qrcode('qr-reader');
+                              setStatus('جارٍ تشغيل الكاميرا وبدء المسح...', 'info');
+                              await html5QrcodeInstance.start(
+                                selectedId,
+                                config,
+                                onScanSuccess,
+                                onScanFailure
+                              );
+
+                              isScanning = true;
+                              setStatus('يتم الآن المسح... وجّه الكاميرا نحو رمز QR.', 'info');
+                            } catch (err) {
+                              // في حال فشل استخدام الكاميرا الخلفية، حاول الكاميرا الافتراضية
+                              try {
+                                const config = { fps: 10, qrbox: { width: 280, height: 280 } };
+                                html5QrcodeInstance = new Html5Qrcode('qr-reader');
+                                await html5QrcodeInstance.start({ facingMode: 'user' }, config, onScanSuccess, onScanFailure);
+                                isScanning = true;
+                                setStatus('تم استخدام الكاميرا الافتراضية. قد تحتاج لاختيار كاميرا أخرى من القائمة.', 'info');
+                              } catch (e) {
+                                console.error('Failed to start camera scanner:', e);
+                                let hint = '';
+                                if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+                                  hint = '\n- يجب استخدام اتصال HTTPS للوصول إلى الكاميرا في المتصفح.';
+                                }
+                                setStatus('تعذر الوصول إلى الكاميرا. يرجى السماح بأذونات الكاميرا من المتصفح. ' + hint + '\nيمكنك أيضًا اختيار كاميرا أخرى أو استخدام الإدخال اليدوي.', 'error');
+                              }
+                            }
+                          }
+
+                          async function stopScanner() {
+                            if (!html5QrcodeInstance || !isScanning) return;
+                            try {
+                              await html5QrcodeInstance.stop();
+                              await html5QrcodeInstance.clear();
+                            } catch (_) {}
+                            isScanning = false;
+                            setStatus('تم إيقاف المسح.', 'info');
+                          }
+
+                          function onScanSuccess(decodedText) {
+                            // تعبئة الحقل وإيقاف المسح ثم إرسال النموذج
+                            textarea.value = decodedText;
+                            stopScanner();
+                            // أرسل النموذج تلقائياً
+                            setTimeout(() => form.submit(), 150);
+                          }
+
+                          function onScanFailure(error) {
+                            // يمكن تجاهل الأخطاء المتكررة أثناء المسح
+                          }
+
+                          startBtn.addEventListener('click', startScanner);
+                          stopBtn.addEventListener('click', stopScanner);
+                          retryBtn.addEventListener('click', async () => {
+                            await stopScanner();
+                            await enumerateCameras();
+                            startScanner();
+                          });
+
+                          // مسح من صورة مرفوعة
+                          scanImageBtn.addEventListener('click', async () => {
+                            try {
+                              if (!qrImageInput.files || qrImageInput.files.length === 0) {
+                                setStatus('يرجى اختيار صورة تحتوي على رمز QR أولاً.', 'error');
+                                return;
+                              }
+                              clearStatus();
+                              const file = qrImageInput.files[0];
+                              setStatus('جارٍ تحليل الصورة لاستخراج رمز QR...', 'info');
+
+                              // 1) المحاولة الأولى: html5-qrcode
+                              try {
+                                const fileScanner = new Html5Qrcode('qr-reader-file');
+                                const decodedText = await fileScanner.scanFile(file, true);
+                                textarea.value = decodedText;
+                                setStatus('تم استخراج الرمز من الصورة بنجاح (html5-qrcode). سيتم إرسال الطلب الآن...', 'success');
+                                setTimeout(() => form.submit(), 150);
+                                return;
+                              } catch (e1) {
+                                console.warn('html5-qrcode scanFile failed, falling back to qr-scanner:', e1);
+                              }
+
+                              // 2) مسار احتياطي: qr-scanner
+                              try {
+                                const decoded = await QrScanner.scanImage(file, { returnDetailedScanResult: true });
+                                const decodedText = decoded?.data || decoded;
+                                textarea.value = decodedText;
+                                setStatus('تم استخراج الرمز من الصورة بنجاح (qr-scanner). سيتم إرسال الطلب الآن...', 'success');
+                                setTimeout(() => form.submit(), 150);
+                                return;
+                              } catch (e2) {
+                                console.error('qr-scanner failed to read image:', e2);
+                                throw e2;
+                              }
+                            } catch (e) {
+                              console.error('Failed to scan from image (both methods):', e);
+                              let detail = (e && (e.message || e.toString())) || '';
+                              setStatus('تعذر قراءة رمز QR من الصورة المختارة.\nتفاصيل: ' + detail + '\nجرّب صورة أوضح، قصّ الرمز بدون حواف كبيرة، أو استخدم الكاميرا/الإدخال اليدوي.', 'error');
+                            }
+                          });
+
+                          // أوقف المسح عند مغادرة الصفحة
+                          window.addEventListener('beforeunload', stopScanner);
+
+                          // عند تحميل الصفحة: تعداد الكاميرات تلقائياً
+                          enumerateCameras();
+                        })();
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>

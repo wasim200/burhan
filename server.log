@@ -1,0 +1,6 @@
+Server running on port 3000
+Connected to MongoDB successfully
+2025-09-17T20:39:57.577Z - GET /admin/dashboard
+2025-09-17T20:39:58.231Z - GET /favicon.ico
+2025-09-17T20:40:01.422Z - GET /admin/dashboard
+2025-09-17T20:40:10.769Z - GET /admin/dashboard

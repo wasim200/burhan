@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المسؤول - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-wrapper {
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+        }
+        .admin-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .stat-card-admin {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+        .stat-card-admin::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+        .stat-card-admin.users::before { background: #007bff; }
+        .stat-card-admin.pending::before { background: #ffc107; }
+        .stat-card-admin.barcodes::before { background: #28a745; }
+        .stat-card-admin.transfers::before { background: #17a2b8; }
+        .stat-card-admin:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .stat-icon-admin {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 28px;
+            color: white;
+        }
+        .stat-icon-admin.users { background: linear-gradient(135deg, #007bff, #0056b3); }
+        .stat-icon-admin.pending { background: linear-gradient(135deg, #ffc107, #e0a800); }
+        .stat-icon-admin.barcodes { background: linear-gradient(135deg, #28a745, #1e7e34); }
+        .stat-icon-admin.transfers { background: linear-gradient(135deg, #17a2b8, #117a8b); }
+        .stat-number-admin {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .stat-card-admin.users .stat-number-admin { color: #007bff; }
+        .stat-card-admin.pending .stat-number-admin { color: #ffc107; }
+        .stat-card-admin.barcodes .stat-number-admin { color: #28a745; }
+        .stat-card-admin.transfers .stat-number-admin { color: #17a2b8; }
+        .admin-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: none;
+        }
+        .card-header-admin {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            padding: 20px 30px;
+            border-bottom: 3px solid #dc3545;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header-admin h3 {
+            color: #dc3545;
+            margin: 0;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'admin', user: user}) %>
+    
+    <div class="admin-wrapper">
+        <div class="container">
+            <!-- Admin Header -->
+            <div class="admin-header">
+                <h1>
+                    <i class="fas fa-user-shield me-2"></i>
+                    لوحة تحكم المسؤول
+                </h1>
+                <p class="mb-0" style="opacity: 0.95;">
+                    <i class="fas fa-chart-line me-2"></i>
+                    مرحباً <%= user.username %>، هذه نظرة عامة على النظام
+                </p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card-admin users">
+                        <div class="stat-icon-admin users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number-admin"><%= stats.totalUsers %></div>
+                        <div class="text-muted">إجمالي المستخدمين</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card-admin pending">
+                        <div class="stat-icon-admin pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-number-admin"><%= stats.pendingTransfers %></div>
+                        <div class="text-muted">تحويلات قيد المراجعة</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card-admin barcodes">
+                        <div class="stat-icon-admin barcodes">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="stat-number-admin"><%= stats.totalBarcodes %></div>
+                        <div class="text-muted">إجمالي الباركودات</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card-admin transfers">
+                        <div class="stat-icon-admin transfers">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-number-admin"><%= stats.totalTransfers %></div>
+                        <div class="text-muted">إجمالي التحويلات</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <!-- آخر التحويلات المعلقة -->
+                <div class="col-12 col-lg-7">
+                    <div class="admin-card">
+                      <div class="card-header-admin">
+                        <h3><i class="fas fa-clock me-2"></i>آخر التحويلات المعلقة</h3>
+                        <a href="/admin/bank-transfers?status=pending" class="btn btn-sm btn-danger">عرض الكل</a>
+                      </div>
+                      <div class="card-body p-0">
+                        <% if (recentTransfers.length > 0) { %>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead style="background: #f8f9fa;">
+                                        <tr>
+                                            <th style="padding: 15px;">المستخدم</th>
+                                            <th>المبلغ</th>
+                                            <th>البنك</th>
+                                            <th>التاريخ</th>
+                                            <th class="text-center">الإجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% recentTransfers.forEach(transfer => { %>
+                                            <tr>
+                                                <td style="padding: 15px;">
+                                                    <div>
+                                                        <strong style="color: #dc3545;"><%= transfer.userId.username %></strong>
+                                                        <br>
+                                                        <small class="text-muted"><%= transfer.userId.email %></small>
+                                                    </div>
+                                                </td>
+                                                <td><strong style="color: #28a745;">$<%= transfer.amount %></strong></td>
+                                                <td><%= transfer.bankName %></td>
+                                                <td><small><%= new Date(transfer.createdAt).toLocaleDateString('ar-SA') %></small></td>
+                                                <td class="text-center">
+                                                    <a href="/admin/bank-transfers" class="btn btn-sm btn-success">
+                                                        <i class="fas fa-check me-1"></i>مراجعة
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } else { %>
+                            <div class="text-center py-5">
+                                <i class="fas fa-inbox" style="font-size: 60px; color: #dee2e6;"></i>
+                                <p class="text-muted mt-3 mb-0">لا توجد تحويلات معلقة حالياً</p>
+                            </div>
+                        <% } %>
+                      </div>
+                    </div>
+                </div>
+
+                <!-- آخر المستخدمين المسجلين -->
+                <div class="col-12 col-lg-5">
+                    <div class="admin-card">
+                      <div class="card-header-admin">
+                        <h3><i class="fas fa-user-plus me-2"></i>آخر المستخدمين</h3>
+                        <a href="/admin/users" class="btn btn-sm btn-danger">عرض الكل</a>
+                      </div>
+                      <div class="card-body">
+                        <% if (recentUsers.length > 0) { %>
+                            <div class="user-list">
+                                <% recentUsers.forEach(user => { %>
+                                    <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
+                                        <div class="d-flex align-items-center gap-3 flex-fill">
+                                            <div class="rounded-circle text-white d-flex align-items-center justify-content-center" 
+                                                 style="width: 50px; height: 50px; background: linear-gradient(135deg, #dc3545, #c82333); font-size: 20px; font-weight: 600;">
+                                                <%= user.username.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div class="flex-fill">
+                                                <div style="font-weight: 600; color: #333;"><%= user.username %></div>
+                                                <small class="text-muted"><%= user.email %></small><br>
+                                                <span class="badge <%= user.subscription.status === 'active' ? 'bg-success' : user.subscription.status === 'pending' ? 'bg-warning text-dark' : 'bg-danger' %>" 
+                                                      style="font-size: 11px; margin-top: 5px;">
+                                                    <%= user.subscription.status === 'active' ? 'نشط' : user.subscription.status === 'pending' ? 'قيد المراجعة' : 'غير نشط' %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <a href="/admin/users" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-cog"></i>
+                                        </a>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } else { %>
+                            <div class="text-center py-4">
+                                <i class="fas fa-user-slash" style="font-size: 50px; color: #dee2e6;"></i>
+                                <p class="text-muted mt-3 mb-0">لا يوجد مستخدمين مسجلين حالياً</p>
+                            </div>
+                        <% } %>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- روابط سريعة -->
+            <div class="admin-card">
+                <div class="card-header-admin">
+                    <h3><i class="fas fa-bolt me-2"></i>الإجراءات السريعة</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <a href="/admin/users" class="btn w-100 btn-outline-primary" style="padding: 15px; border-width: 2px;">
+                                <i class="fas fa-users d-block mb-2" style="font-size: 24px;"></i>
+                                إدارة المستخدمين
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/admin/bank-transfers" class="btn w-100 btn-outline-warning" style="padding: 15px; border-width: 2px;">
+                                <i class="fas fa-money-bill-wave d-block mb-2" style="font-size: 24px;"></i>
+                                مراجعة التحويلات
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/admin/barcodes" class="btn w-100 btn-outline-success" style="padding: 15px; border-width: 2px;">
+                                <i class="fas fa-qrcode d-block mb-2" style="font-size: 24px;"></i>
+                                عرض الباركودات
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/admin/stats" class="btn w-100 btn-outline-info" style="padding: 15px; border-width: 2px;">
+                                <i class="fas fa-chart-line d-block mb-2" style="font-size: 24px;"></i>
+                                الإحصائيات
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>

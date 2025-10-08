@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        
+        .register-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #136d62 0%, #0a4d45 100%);
+            padding: 40px 0;
+        }
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .register-header {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .register-header i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .register-body {
+            padding: 40px 30px;
+        }
+        .input-group-custom {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .input-group-custom input {
+            padding-right: 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            height: 50px;
+            transition: all 0.3s ease;
+        }
+        .input-group-custom input:focus {
+            border-color: #136d62;
+            box-shadow: 0 0 0 0.2rem rgba(19, 109, 98, 0.15);
+        }
+        .input-group-custom .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 18px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .input-group-custom input:focus ~ .input-icon {
+            color: #136d62;
+        }
+        .input-group-custom .validation-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            display: none;
+        }
+        .input-group-custom input.is-valid ~ .validation-icon.valid {
+            display: block;
+            color: #28a745;
+        }
+        .input-group-custom input.is-invalid ~ .validation-icon.invalid {
+            display: block;
+            color: #dc3545;
+        }
+        .password-strength {
+            height: 5px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+        }
+        .strength-weak { width: 33%; background: #dc3545; }
+        .strength-medium { width: 66%; background: #ffc107; }
+        .strength-strong { width: 100%; background: #28a745; }
+        .btn-register {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            border: none;
+            height: 55px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(19, 109, 98, 0.4);
+        }
+        .btn-register:disabled {
+            background: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .checkbox-custom {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .checkbox-custom input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .alert-custom {
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-custom i {
+            font-size: 20px;
+        }
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #999;
+            font-size: 14px;
+        }
+        @media (max-width: 576px) {
+            .register-header {
+                padding: 30px 20px;
+            }
+            .register-body {
+                padding: 30px 20px;
+            }
+        }
+
+
+        .body{
+            color: #a72828;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header', {currentPage: 'register', user: user}) %>
+    
+    <div class="register-wrapper">
+        <div class="container">
+            <div class="register-card">
+                <div class="register-header">
+                    <i class="fas fa-user-shield"></i>
+                    <h2 class="mb-0">إنشاء حساب جديد</h2>
+                    <p class="mb-0 mt-2" style="opacity: 0.9;">انضم إلى بٌـرهــان نظام التوقيع الرقمي الآمن</p>
+                </div>
+                
+                <div class="register-body">
+            
+                    <% if (error) { %>
+                        <div class="alert-custom alert-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span><%= error %></span>
+                        </div>
+                    <% } %>
+                    
+                    <form action="/register" method="POST" id="registerForm">
+                        <!-- اسم المستخدم -->
+                        <div class="input-group-custom">
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                class="form-control" 
+                                required 
+                                minlength="3" 
+                                maxlength="50"
+                                pattern="[a-zA-Z0-9_]+"
+                                placeholder="أدخل اسم المستخدم">
+                            <i class="fas fa-user input-icon"></i>
+                            
+                           
+                        </div>
+                        
+                        <!-- البريد الإلكتروني -->
+                        <div class="input-group-custom">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-control" 
+                                required
+                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                placeholder="أدخل البريد الإلكتروني">
+                            <i class="fas fa-envelope input-icon"></i>
+                            
+                            
+                        </div>
+                        
+                        <!-- كلمة المرور -->
+                        <div class="input-group-custom">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-control" 
+                                required 
+                                minlength="6"
+                                placeholder="أدخل كلمة المرور">
+                            <i class="fas fa-lock input-icon"></i>
+                            <i class="fas fa-eye toggle-password" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; z-index: 11;"></i>
+                            <div class="password-strength">
+                                <div class="password-strength-bar" id="strengthBar"></div>
+                            </div>
+                            <small class="form-text text-muted mt-2" id="strengthText" style="display: block;"></small>
+                        </div>
+                        
+                        <!-- تأكيد كلمة المرور -->
+                        <div class="input-group-custom">
+                            <input 
+                                type="password" 
+                                id="passwordConfirm" 
+                                name="passwordConfirm" 
+                                class="form-control" 
+                                required 
+                                minlength="6"
+                                placeholder="أعد إدخال كلمة المرور">
+                            <i class="fas fa-lock input-icon"></i>
+                            
+                            
+                        </div>
+                        
+                        <!-- الشروط والأحكام -->
+                        <div class="checkbox-custom mb-4">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <label for="terms" style="margin: 0; cursor: pointer; font-size: 14px;">
+                                أوافق على <a href="/terms" target="_blank" style="color: #136d62; font-weight: 600;">شروط الاستخدام</a>
+                                و <a href="/privacy" target="_blank" style="color: #136d62; font-weight: 600;">سياسة الخصوصية</a>
+                            </label>
+                        </div>
+                        
+                        <!-- زر الإرسال -->
+                        <button type="submit" class="btn btn-primary btn-register w-100" id="submitBtn">
+                            <span id="btnText">
+                                <i class="fas fa-user-plus me-2"></i>إنشاء حساب
+                            </span>
+                            <span id="btnLoading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                جاري الإنشاء...
+                            </span>
+                        </button>
+                    </form>
+                    
+                    <div class="divider">
+                        <span>أو</span>
+                    </div>
+                    
+                    <p class="text-center mb-0">
+                        <i class="fas fa-user-check me-2" style="color: #136d62;"></i>
+                        لديك حساب بالفعل؟ 
+                        <a href="/login" style="color: #136d62; font-weight: 600; text-decoration: none;">
+                            تسجيل الدخول
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('partials/footer') %>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            const password = document.getElementById('password');
+            const passwordConfirm = document.getElementById('passwordConfirm');
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            const togglePassword = document.querySelector('.toggle-password');
+            
+            // إظهار/إخفاء كلمة المرور
+            togglePassword.addEventListener('click', function() {
+                const type = password.type === 'password' ? 'text' : 'password';
+                password.type = type;
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+            
+            // قياس قوة كلمة المرور
+            password.addEventListener('input', function() {
+                const value = this.value;
+                let strength = 0;
+                
+                if (value.length >= 6) strength++;
+                if (value.length >= 10) strength++;
+                if (/[a-z]/.test(value) && /[A-Z]/.test(value)) strength++;
+                if (/\d/.test(value)) strength++;
+                if (/[^a-zA-Z0-9]/.test(value)) strength++;
+                
+                strengthBar.className = 'password-strength-bar';
+                if (strength <= 2) {
+                    strengthBar.classList.add('strength-weak');
+                    strengthText.textContent = '⚠️ كلمة مرور ضعيفة';
+                    strengthText.style.color = '#dc3545';
+                } else if (strength <= 3) {
+                    strengthBar.classList.add('strength-medium');
+                    strengthText.textContent = '⚡ كلمة مرور متوسطة';
+                    strengthText.style.color = '#ffc107';
+                } else {
+                    strengthBar.classList.add('strength-strong');
+                    strengthText.textContent = '✅ كلمة مرور قوية';
+                    strengthText.style.color = '#28a745';
+                }
+            });
+            
+            // التحقق من المدخلات
+            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.checkValidity()) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    } else {
+                        this.classList.remove('is-valid');
+                        if (this.value.length > 0) {
+                            this.classList.add('is-invalid');
+                        }
+                    }
+                });
+            });
+            
+            // التحقق من تطابق كلمة المرور
+            function validatePasswordMatch() {
+                if (passwordConfirm.value.length > 0) {
+                    if (password.value === passwordConfirm.value) {
+                        passwordConfirm.classList.remove('is-invalid');
+                        passwordConfirm.classList.add('is-valid');
+                        passwordConfirm.setCustomValidity('');
+                    } else {
+                        passwordConfirm.classList.remove('is-valid');
+                        passwordConfirm.classList.add('is-invalid');
+                        passwordConfirm.setCustomValidity('كلمة المرور غير متطابقة');
+                    }
+                }
+            }
+            
+            password.addEventListener('input', validatePasswordMatch);
+            passwordConfirm.addEventListener('input', validatePasswordMatch);
+            
+            // إرسال النموذج
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                if (password.value !== passwordConfirm.value) {
+                    alert('⚠️ كلمة المرور وتأكيد كلمة المرور غير متطابقتين');
+                    return;
+                }
+                
+                const terms = document.getElementById('terms');
+                if (!terms.checked) {
+                    alert('⚠️ يجب الموافقة على شروط الاستخدام وسياسة الخصوصية');
+                    return;
+                }
+                
+                submitBtn.disabled = true;
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline';
+                
+                form.submit();
+            });
+        });
+    </script>
+</body>
+</html>

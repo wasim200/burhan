@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتيجة الباركود - بٌـرهــان</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .result-wrapper {
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .result-header {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .result-header i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .result-body {
+            padding: 40px 30px;
+        }
+        .qr-container {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        .qr-container img {
+            max-width: 350px;
+            border: 5px solid white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .info-grid {
+            display: grid;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-right: 4px solid #136d62;
+        }
+        .info-item label {
+            font-weight: 600;
+            color: #136d62;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .info-item .value {
+            color: #333;
+            font-size: 15px;
+            word-break: break-all;
+        }
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 30px;
+        }
+        .btn-action {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        .btn-primary {
+            background: #136d62;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0a4d45;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(19,109,98,0.3);
+        }
+        .btn-download {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-download:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,193,7,0.3);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .alert-danger {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        @media (max-width: 768px) {
+            .btn-group {
+                grid-template-columns: 1fr;
+            }
+            .qr-container img {
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'create-barcode', user: user}) %>
+    
+    <div class="result-wrapper">
+        <div class="container">
+            <% if (success) { %>
+                <div class="result-card">
+                    <!-- Header -->
+                    <div class="result-header">
+                        <i class="fas fa-check-circle"></i>
+                        <h1 style="font-size: 1.8rem; margin: 0;">تم إنشاء الباركود بنجاح!</h1>
+                        <p style="margin: 10px 0 0 0; opacity: 0.95;">باركود آمن ومشفر لوثيقتك</p>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="result-body">
+                        <!-- معلومات الوثيقة -->
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label><i class="fas fa-file-alt me-2"></i>اسم الوثيقة</label>
+                                <div class="value"><%= documentName %></div>
+                            </div>
+                            <div class="info-item">
+                                <label><i class="fas fa-calendar me-2"></i>تاريخ الإنشاء</label>
+                                <div class="value"><%= createdAt.toLocaleString('ar-SA') %></div>
+                            </div>
+                            <div class="info-item">
+                                <label><i class="fas fa-fingerprint me-2"></i>معرف الباركود</label>
+                                <div class="value"><code style="background: white; padding: 5px 10px; border-radius: 5px;"><%= barcodeId %></code></div>
+                            </div>
+                            <div class="info-item">
+                                <label><i class="fas fa-lock me-2"></i>Hash الوثيقة</label>
+                                <div class="value" style="font-size: 13px; font-family: monospace;"><%= documentHash %></div>
+                            </div>
+                        </div>
+
+                        <!-- QR Code -->
+                        <div class="qr-container">
+                            <img id="qrCodeImage" src="<%= qrCodeData %>" alt="الباركود المشفر">
+                            <p style="margin-top: 20px; color: #666; font-weight: 500;">
+                                <i class="fas fa-info-circle me-1"></i>
+                                امسح هذا الرمز للتحقق من الوثيقة
+                            </p>
+                        </div>
+
+                        <!-- الأزرار -->
+                        <div class="btn-group">
+                            <button onclick="downloadQRCode()" class="btn-action btn-download">
+                                <i class="fas fa-download"></i>
+                                حفظ الصورة للمعرض
+                            </button>
+                            <button onclick="window.print()" class="btn-action btn-success">
+                                <i class="fas fa-print"></i>
+                                طباعة
+                            </button>
+                            <a href="/barcode/list" class="btn-action btn-secondary">
+                                <i class="fas fa-list"></i>
+                                عرض القائمة
+                            </a>
+                            <a href="/barcode/create" class="btn-action btn-primary">
+                                <i class="fas fa-plus-circle"></i>
+                                إنشاء جديد
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="result-card">
+                    <div class="result-header" style="background: linear-gradient(135deg, #dc3545, #c82333);">
+                        <i class="fas fa-times-circle"></i>
+                        <h1 style="font-size: 1.8rem; margin: 0;">فشل في إنشاء الباركود</h1>
+                    </div>
+                    <div class="result-body">
+                        <div class="alert-danger">
+                            <h3><i class="fas fa-exclamation-triangle me-2"></i>حدث خطأ</h3>
+                            <p><%= message %></p>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <a href="/barcode/create" class="btn-action btn-primary">
+                                <i class="fas fa-redo me-2"></i>
+                                المحاولة مرة أخرى
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+
+    <script>
+        // دالة تحميل صورة الباركود
+        function downloadQRCode() {
+            const qrImage = document.getElementById('qrCodeImage');
+            const documentName = '<%= success ? documentName : "barcode" %>';
+            
+            // إنشاء عنصر canvas لرسم الصورة
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // تحميل الصورة
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.src = qrImage.src;
+            
+            img.onload = function() {
+                // تعيين حجم Canvas
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                // رسم الصورة على Canvas
+                ctx.drawImage(img, 0, 0);
+                
+                // تحويل Canvas إلى Blob
+                canvas.toBlob(function(blob) {
+                    // إنشاء رابط تحميل
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    const fileName = `barcode_${documentName}_${Date.now()}.png`;
+                    
+                    link.href = url;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // تنظيف الذاكرة
+                    URL.revokeObjectURL(url);
+                    
+                    // إظهار رسالة نجاح
+                    alert('✅ تم حفظ الصورة بنجاح!\nاسم الملف: ' + fileName);
+                }, 'image/png');
+            };
+            
+            img.onerror = function() {
+                alert('❌ حدث خطأ أثناء تحميل الصورة. حاول مرة أخرى.');
+            };
+        }
+    </script>
+</body>
+</html>

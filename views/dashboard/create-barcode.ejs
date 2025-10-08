@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء باركود - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .create-wrapper {
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        .page-header {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(19, 109, 98, 0.3);
+        }
+        .page-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .create-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: none;
+        }
+        .card-header-custom {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            padding: 20px 30px;
+            border-bottom: 3px solid #136d62;
+        }
+        .card-header-custom h3 {
+            color: #136d62;
+            margin: 0;
+            font-size: 1.3rem;
+        }
+        .input-group-modern {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .input-group-modern label {
+            font-weight: 600;
+            color: #136d62;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .input-group-modern input,
+        .input-group-modern textarea {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+        .input-group-modern input:focus,
+        .input-group-modern textarea:focus {
+            border-color: #136d62;
+            box-shadow: 0 0 0 0.2rem rgba(19, 109, 98, 0.15);
+        }
+        .input-group-modern textarea {
+            resize: vertical;
+            min-height: 200px;
+        }
+        .char-counter {
+            text-align: left;
+            font-size: 13px;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+        .char-counter.warning {
+            color: #ffc107;
+        }
+        .char-counter.danger {
+            color: #dc3545;
+        }
+        .btn-create {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(19, 109, 98, 0.4);
+            color: white;
+        }
+        .btn-create:disabled {
+            background: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .info-box {
+            background: linear-gradient(135deg, #fff3cd, #ffe69c);
+            border-left: 4px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .info-box h5 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        .info-box ul {
+            margin: 0;
+            padding-right: 20px;
+            color: #856404;
+        }
+        .info-box ul li {
+            margin-bottom: 5px;
+        }
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'create-barcode', user: user}) %>
+    
+    <div class="create-wrapper">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>
+                    <i class="fas fa-plus-circle me-2"></i>
+                    إنشاء باركود مشفر جديد
+                </h1>
+                <p class="mb-0" style="opacity: 0.95;">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    قم بإنشاء باركود مشفر للوثيقة مع توقيع رقمي آمن
+                </p>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <h5>
+                    <i class="fas fa-info-circle me-2"></i>
+                    إرشادات الاستخدام
+                </h5>
+                <ul>
+                    <li>اكتب اسماً واضحاً وفريداً للوثيقة</li>
+                    <li>أدخل محتوى الوثيقة كاملاً في حقل المحتوى</li>
+                    <li>سيتم تشفير المحتوى تلقائياً وإنشاء توقيع رقمي</li>
+                    <li>يمكنك تحميل الباركود وطباعته بعد الإنشاء</li>
+                </ul>
+            </div>
+
+            <!-- Create Form -->
+            <div class="create-card">
+                <div class="card-header-custom">
+                    <h3>
+                        <i class="fas fa-file-alt me-2"></i>
+                        معلومات الوثيقة
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form action="/barcode/create" method="POST" id="createForm">
+                        <!-- Document Name -->
+                        <div class="input-group-modern">
+                            <label for="documentName">
+                                <i class="fas fa-tag"></i>
+                                اسم الوثيقة
+                            </label>
+                            <input 
+                                type="text" 
+                                id="documentName" 
+                                name="documentName" 
+                                required 
+                                class="form-control"
+                                placeholder="مثال: شهادة تخرج - أحمد محمد"
+                                minlength="3"
+                                maxlength="100">
+                            <small class="text-muted">اسم يساعدك على التعرف على الوثيقة</small>
+                        </div>
+                        
+                        <!-- Document Content -->
+                        <div class="input-group-modern">
+                            <label for="documentContent">
+                                <i class="fas fa-file-text"></i>
+                                محتوى الوثيقة
+                            </label>
+                            <textarea 
+                                id="documentContent" 
+                                name="documentContent" 
+                                required 
+                                class="form-control"
+                                placeholder="أدخل محتوى الوثيقة الكامل هنا...&#10;&#10;مثال:&#10;شهادة تخرج&#10;الاسم: أحمد محمد&#10;التخصص: علوم الحاسوب&#10;التاريخ: 2024/01/15"
+                                minlength="10"></textarea>
+                            <div class="char-counter" id="charCounter">
+                                <i class="fas fa-keyboard me-1"></i>
+                                0 حرف
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn-create" id="submitBtn">
+                            <i class="fas fa-qrcode me-2"></i>
+                            إنشاء الباركود المشفر
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const documentContent = document.getElementById('documentContent');
+            const charCounter = document.getElementById('charCounter');
+            const form = document.getElementById('createForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Character counter
+            documentContent.addEventListener('input', function() {
+                const length = this.value.length;
+                charCounter.innerHTML = `<i class="fas fa-keyboard me-1"></i>${length} حرف`;
+                
+                // Color coding
+                charCounter.classList.remove('warning', 'danger');
+                if (length > 800) {
+                    charCounter.classList.add('danger');
+                } else if (length > 500) {
+                    charCounter.classList.add('warning');
+                }
+            });
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الإنشاء...';
+            });
+        });
+    </script>
+</body>
+</html>

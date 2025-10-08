@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة التشفير - نظام التوقيع الرقمي</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <%- include('../partials/header', {currentPage: 'encryption', user: user}) %>
+
+  <div class="dashboard">
+    <div class="container py-3">
+      <div class="dashboard-header mb-4">
+        <h1 class="h3 mb-1">إدارة التشفير</h1>
+        <p class="mb-0">قم بتحديث مفتاح التشفير الخاص بحسابك بعناية. سيؤثر ذلك على قراءة الباركودات القديمة.</p>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+      <% if (typeof message !== 'undefined' && message) { %>
+        <div class="alert alert-success"><%= message %></div>
+      <% } %>
+
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h3 class="h5 mb-0">تحديث مفتاح التشفير</h3>
+        </div>
+        <div class="card-body">
+          <form action="/encryption" method="POST" id="encryptionForm">
+            <div class="mb-3">
+              <label for="currentKey" class="form-label">المفتاح الحالي</label>
+              <input type="password" id="currentKey" name="currentKey" class="form-control" placeholder="••••••••" required>
+              <div class="form-text">أدخل المفتاح الحالي لتأكيد الهوية.</div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label for="newKey" class="form-label">المفتاح الجديد</label>
+                <input type="password" id="newKey" name="newKey" class="form-control" minlength="32" placeholder="أدخل مفتاحاً قوياً بطول 32 محرفاً" required>
+                <div class="form-text">يفضل طول 32 حرفاً لضمان قوة التشفير.</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="confirmKey" class="form-label">تأكيد المفتاح الجديد</label>
+                <input type="password" id="confirmKey" name="confirmKey" class="form-control" minlength="32" placeholder="أعد إدخال المفتاح الجديد" required>
+              </div>
+            </div>
+
+            <div class="alert alert-warning mt-3">
+              <i class="fa-solid fa-triangle-exclamation ms-1"></i>
+              تنبيه: تغيير المفتاح قد يمنع فك تشفير باركودات سابقة مشفّرة بالمفتاح القديم. قم بتنزيل نسخ احتياطية قبل المتابعة.
+            </div>
+
+            <div class="d-flex gap-2 mt-2">
+              <button type="submit" class="btn btn-primary" id="btnSubmit">تحديث المفتاح</button>
+              <a href="/dashboard" class="btn btn-secondary">إلغاء</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+
+  <script>
+    // تحقق بسيط من تطابق المفاتيح على الواجهة
+    (function(){
+      const form = document.getElementById('encryptionForm');
+      const newKey = document.getElementById('newKey');
+      const confirmKey = document.getElementById('confirmKey');
+      form.addEventListener('submit', function(e){
+        if(newKey.value !== confirmKey.value){
+          e.preventDefault();
+          alert('المفتاح الجديد وتأكيده غير متطابقين');
+          confirmKey.focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

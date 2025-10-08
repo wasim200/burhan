@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تم الدفع بنجاح - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'subscription', user: user}) %>
+    
+    <div class="dashboard">
+        <div class="container">
+            <div class="auth-container" style="text-align: center;">
+                <div class="alert alert-success">
+                    <h2>تم الدفع بنجاح! 🎉</h2>
+                    <p>شكراً لك على اشتراكك في نظام التوقيع الرقمي.</p>
+                    <p>سيتم تفعيل اشتراكك خلال بضع دقائق.</p>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <a href="/dashboard" class="btn btn-primary">العودة إلى لوحة التحكم</a>
+                    <a href="/dashboard/subscription" class="btn btn-secondary">عرض حالة الاشتراك</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>

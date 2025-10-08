@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>غير مصرح - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <%- include('partials/header', {currentPage: '403', user: user}) %>
+    
+    <div class="container" style="margin-top: 3rem; margin-bottom: 3rem;">
+        <div class="auth-container">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 6rem; color: var(--danger-color); margin-bottom: 1rem;">🚫</div>
+                <h1 style="color: var(--danger-color); margin-bottom: 1rem;">403 - غير مصرح</h1>
+                <p style="color: var(--text-secondary); font-size: 1.2rem;">عذراً، ليس لديك صلاحية للوصول إلى هذه الصفحة</p>
+            </div>
+            
+            <div class="alert alert-danger" style="margin: 2rem 0;">
+                <h4 style="margin-bottom: 1rem;">الوصول مرفوض</h4>
+                <p style="margin-bottom: 1rem;">
+                    <%= message || 'ليس لديك الصلاحية المطلوبة للوصول إلى هذه الصفحة.' %>
+                </p>
+                <ul style="text-align: right; margin: 1rem 0; padding-right: 1.5rem;">
+                    <li>تأكد من أنك مسجل الدخول بحساب صحيح</li>
+                    <li>تحقق من أن لديك الصلاحيات المطلوبة</li>
+                    <li>إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع الدعم</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="/dashboard" class="btn btn-primary" style="margin-left: 1rem;">العودة للوحة التحكم</a>
+                <a href="/" class="btn btn-secondary">العودة للرئيسية</a>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+                    <i class="fas fa-info-circle" style="margin-left: 0.5rem;"></i>
+                    إذا كنت تحتاج إلى صلاحيات إضافية، يرجى التواصل مع المدير
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('partials/footer') %>
+</body>
+</html>

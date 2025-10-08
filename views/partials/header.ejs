@@ -1,0 +1,155 @@
+<header>
+  <% if (typeof user === 'undefined') { user = null; } %>
+  <% if (typeof currentPage === 'undefined') { currentPage = ''; } %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+
+  <nav class="navbar navbar-expand-lg navbar-dark" id="mainNavbar" style="background: linear-gradient(135deg, #136d62, #0a4d45); box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-bottom: 3px solid #ffc107; position: fixed; top: 0; left: 0; right: 0; z-index: 1030; transition: transform 0.3s ease-in-out;">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/" style="font-size: 24px;">
+        <i class="fas fa-shield-alt" style="font-size: 32px; color: #ffc107;"></i>
+        <span class="fw-bold" style="letter-spacing: 1px;">بٌـرهــان</span>
+        <small class="text-white-50" style="font-size: 12px;">| توقيع رقمي آمن</small>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mainNav" aria-controls="mainNav" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="mainNav" aria-labelledby="mainNavLabel" style="background: linear-gradient(135deg, #136d62, #0a4d45);">
+        <div class="offcanvas-header" style="border-bottom: 2px solid #ffc107;">
+          <h5 class="offcanvas-title" id="mainNavLabel"><i class="fas fa-bars me-2"></i>القائمة الرئيسية</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+            <% if (!user) { %>
+              <li class="nav-item"><a class="nav-link <%= (currentPage === 'home') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/"><i class="fas fa-home me-2"></i>الرئيسية</a></li>
+              <li class="nav-item"><a class="nav-link <%= (currentPage === 'login') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/login"><i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول</a></li>
+              <li class="nav-item"><a class="nav-link <%= (currentPage === 'register') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/register"><i class="fas fa-user-plus me-2"></i>إنشاء حساب</a></li>
+            <% } else { %>
+              <li class="nav-item"><a class="nav-link <%= (currentPage === 'dashboard') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/dashboard"><i class="fas fa-th-large me-2"></i>لوحة التحكم</a></li>
+              <li class="nav-item"><a class="nav-link <%= (currentPage === 'create-barcode') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/barcode/create"><i class="fas fa-plus-circle me-2"></i>إنشاء باركود</a></li>
+              <li class="nav-item"><a class="nav-link <%= (currentPage === 'barcode-list') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/barcode/list"><i class="fas fa-qrcode me-2"></i>الباركودات</a></li>
+              <li class="nav-item"><a class="nav-link <%= (currentPage === 'read-barcode') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/barcode/read"><i class="fas fa-camera me-2"></i>قراءة باركود</a></li>
+              <li class="nav-item"><a class="nav-link <%= (currentPage === 'subscription') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/dashboard/subscription"><i class="fas fa-crown me-2"></i>الاشتراك</a></li>
+              <li class="nav-item"><a class="nav-link" href="/profile/view"><i class="fas fa-user-circle me-2"></i>الملف الشخصي</a></li>
+              <li class="nav-item"><a class="nav-link" href="/profile"><i class="fas fa-user-edit me-2"></i>تعديل الملف</a></li>
+              <% if (user && user.role === 'admin') { %>
+                <li class="nav-item"><a class="nav-link <%= (currentPage === 'admin') ? 'active bg-danger bg-opacity-25 rounded' : '' %>" href="/admin/dashboard"><i class="fas fa-user-shield me-2"></i>لوحة الإدارة</a></li>
+              <% } %>
+              <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.2);"></li>
+              <li class="nav-item mt-2"><a class="btn btn-sm" style="background: #ffc107; color: #136d62; font-weight: 600; width: 100%;" href="/logout"><i class="fas fa-right-from-bracket me-2"></i>تسجيل الخروج</a></li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <style>
+  /* Add padding to body to prevent content from going under fixed navbar */
+  body {
+    padding-top: 70px; /* Adjust based on your navbar height */
+  }
+  
+  @media (max-width: 992px) {
+    body {
+      padding-top: 60px; /* Smaller padding on mobile */
+    }
+  }
+  
+  .nav-link {
+    transition: all 0.3s ease;
+    padding: 10px 15px;
+    margin: 2px 0;
+  }
+  .nav-link:hover {
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    transform: translateX(-5px);
+  }
+  .nav-link.active {
+    background: rgba(255,255,255,0.15);
+    border-right: 3px solid #ffc107;
+  }
+  .navbar-brand:hover {
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+  }
+  
+  /* Hide navbar on scroll down - smooth transition */
+  .navbar-hidden {
+    transform: translateY(-100%) !important;
+  }
+  
+  /* Ensure smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  </style>
+
+  <script>
+  // Auto-hide navbar on scroll (Enhanced for mobile)
+  (function() {
+    let lastScrollTop = 0;
+    let navbar = document.getElementById('mainNavbar');
+    let offcanvas = document.getElementById('mainNav');
+    let scrollThreshold = 100;
+    let ticking = false;
+    
+    // Function to handle scroll
+    function handleScroll() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Check if offcanvas is open (for mobile)
+      let isOffcanvasOpen = offcanvas && offcanvas.classList.contains('show');
+      
+      // Don't hide navbar if:
+      // 1. At the top of the page
+      // 2. Offcanvas menu is open
+      // 3. On very small screens (optional - uncomment if needed)
+      if (scrollTop < scrollThreshold || isOffcanvasOpen) {
+        navbar.classList.remove('navbar-hidden');
+        lastScrollTop = scrollTop;
+        ticking = false;
+        return;
+      }
+      
+      // Scrolling down
+      if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+        navbar.classList.add('navbar-hidden');
+      } 
+      // Scrolling up
+      else if (scrollTop < lastScrollTop) {
+        navbar.classList.remove('navbar-hidden');
+      }
+      
+      lastScrollTop = scrollTop;
+      ticking = false;
+    }
+    
+    // Use requestAnimationFrame for better performance
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        window.requestAnimationFrame(handleScroll);
+        ticking = true;
+      }
+    }, { passive: true });
+    
+    // Always show navbar when offcanvas opens
+    if (offcanvas) {
+      offcanvas.addEventListener('show.bs.offcanvas', function() {
+        navbar.classList.remove('navbar-hidden');
+      });
+      
+      // Keep navbar visible when offcanvas is open
+      offcanvas.addEventListener('shown.bs.offcanvas', function() {
+        navbar.classList.remove('navbar-hidden');
+      });
+    }
+  })();
+  </script>
+</header>

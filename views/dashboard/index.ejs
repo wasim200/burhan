@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <style>
+        .dashboard-wrapper {
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        .welcome-card {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(19, 109, 98, 0.3);
+        }
+        .welcome-card h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 28px;
+            color: white;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #136d62;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            height: 100%;
+            border: none;
+        }
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .action-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 32px;
+            color: #136d62;
+        }
+        .action-card h3 {
+            color: #136d62;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        .action-card p {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .btn-action {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(19, 109, 98, 0.4);
+            color: white;
+        }
+        .quick-links {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .quick-link-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 12px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #136d62;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .quick-link-btn:hover {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            border-color: #136d62;
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .welcome-card h1 {
+                font-size: 1.5rem;
+            }
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'dashboard', user: user}) %>
+    
+    <div class="dashboard-wrapper">
+        <div class="container">
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <h1>
+                    <i class="fas fa-hand-sparkles me-2"></i>
+                    مرحباً <%= user.username %>!
+                </h1>
+                <p class="mb-0" style="opacity: 0.95;">
+                    <i class="fas fa-chart-line me-2"></i>
+                    هذه لوحة التحكم الخاصة بك. يمكنك إدارة الباركودات والاشتراكات من هنا
+                </p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.totalBarcodes %></div>
+                        <div class="stat-label">الباركودات المنشأة</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.scannedBarcodes %></div>
+                        <div class="stat-label">الباركودات الممسوحة</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.activeBarcodes %></div>
+                        <div class="stat-label">الباركودات النشطة</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-number"><%= stats.daysRemaining %></div>
+                        <div class="stat-label">أيام متبقية</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="quick-links">
+                <h5 class="mb-3">
+                    <i class="fas fa-bolt me-2"></i>
+                    روابط سريعة
+                </h5>
+                <div class="row g-2">
+                    <div class="col-6 col-md-2">
+                        <a class="quick-link-btn w-100" href="/barcode/create">
+                            <i class="fas fa-plus-circle"></i>
+                            إنشاء
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <a class="quick-link-btn w-100" href="/barcode/list">
+                            <i class="fas fa-list"></i>
+                            القائمة
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <a class="quick-link-btn w-100" href="/barcode/read">
+                            <i class="fas fa-camera"></i>
+                            القراءة
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <a class="quick-link-btn w-100" href="/encryption">
+                            <i class="fas fa-key"></i>
+                            التشفير
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <a class="quick-link-btn w-100" href="/subscription">
+                            <i class="fas fa-crown"></i>
+                            الاشتراك
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <a class="quick-link-btn w-100" href="/profile">
+                            <i class="fas fa-user"></i>
+                            الملف
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Cards -->
+            <div class="row g-4">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <h3>إنشاء باركود جديد</h3>
+                        <p>قم بإنشاء باركود مشفر جديد للوثائق وحمايتها بتوقيع رقمي آمن</p>
+                        <a href="/barcode/create" class="btn-action">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            بدء الإنشاء
+                        </a>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-list-alt"></i>
+                        </div>
+                        <h3>الباركودات الصادرة</h3>
+                        <p>عرض وإدارة جميع الباركودات المنشأة سابقاً مع إحصائيات تفصيلية</p>
+                        <a href="/barcode/list" class="btn-action">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            عرض القائمة
+                        </a>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <h3>قراءة باركود</h3>
+                        <p>قراءة والتحقق الفوري من صحة الباركودات المشفرة</p>
+                        <a href="/barcode/read" class="btn-action">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            بدء القراءة
+                        </a>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3>إدارة التشفير</h3>
+                        <p>تغيير وإدارة مفتاح التشفير الخاص بحسابك</p>
+                        <a href="/encryption" class="btn-action">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            الإدارة
+                        </a>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h3>خطة الاشتراك</h3>
+                        <p>عرض وتحديث خطة الاشتراك والميزات المتاحة</p>
+                        <a href="/subscription" class="btn-action">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            عرض التفاصيل
+                        </a>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h3>الملف الشخصي</h3>
+                        <p>إدارة المعلومات الشخصية وإعدادات الحساب</p>
+                        <a href="/profile" class="btn-action">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            التعديل
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>

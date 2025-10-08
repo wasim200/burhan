@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قراءة باركود - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <style>
+        .scan-method-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .scan-method-tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        .scan-method-tab:hover {
+            color: #333;
+            background: #f5f5f5;
+        }
+        .scan-method-tab.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+            font-weight: 600;
+        }
+        .scan-content {
+            display: none;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-height: 300px;
+        }
+        .scan-content.active {
+            display: block;
+        }
+        #qr-reader {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+        #qr-reader video {
+            width: 100% !important;
+            height: auto !important;
+            border-radius: 6px;
+        }
+        .camera-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .status-message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .image-upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .image-upload-area:hover {
+            background: #f0f8ff;
+            border-color: #0056b3;
+        }
+        .image-upload-area.dragover {
+            background: #e3f2fd;
+            border-color: #0056b3;
+            border-style: solid;
+        }
+        .upload-icon {
+            font-size: 48px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .selected-file-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-radius: 6px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'read-barcode', user: user}) %>
+    
+    <div class="dashboard">
+        <div class="container py-3">
+            <div class="dashboard-header mb-4">
+                <h1 class="h3 mb-1">قراءة الباركود المشفر</h1>
+                <p class="mb-0">قم بقراءة الباركود للتحقق من صحة الوثيقة</p>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h3 class="h5 mb-0">طرق مسح الباركود</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Tabs للطرق المختلفة -->
+                    <div class="scan-method-tabs">
+                        <button class="scan-method-tab active" data-tab="manual">
+                            <i class="fas fa-keyboard me-1"></i> إدخال يدوي
+                        </button>
+                        <button class="scan-method-tab" data-tab="camera">
+                            <i class="fas fa-camera me-1"></i> مسح بالكاميرا
+                        </button>
+                        <button class="scan-method-tab" data-tab="image">
+                            <i class="fas fa-image me-1"></i> رفع صورة
+                        </button>
+                    </div>
+
+                    <!-- محتوى الإدخال اليدوي -->
+                    <div class="scan-content active" id="manual-content">
+                        <form id="readForm" action="/barcode/read" method="POST">
+                            <div class="mb-3">
+                                <label for="barcodeData" class="form-label">بيانات الباركود</label>
+                                <textarea 
+                                    id="barcodeData" 
+                                    name="barcodeData" 
+                                    rows="8" 
+                                    required 
+                                    class="form-control"
+                                    placeholder="الصق بيانات الباركود هنا..."></textarea>
+                                <div class="form-text">
+                                    يمكنك لصق معرف الباركود أو البيانات المشفرة مباشرة
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>قراءة الباركود
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- محتوى مسح الكاميرا -->
+                    <div class="scan-content" id="camera-content">
+                        <div class="text-center mb-3">
+                            <p class="text-muted">استخدم كاميرا جهازك لمسح رمز QR مباشرة</p>
+                        </div>
+                        
+                        <div id="qr-reader" style="max-width: 500px; margin: 0 auto;"></div>
+                        
+                        <div class="camera-controls">
+                            <select id="cameraSelect" class="form-select" style="max-width: 250px;">
+                                <option value="">اختر الكاميرا...</option>
+                            </select>
+                            <button id="startScanBtn" type="button" class="btn btn-success">
+                                <i class="fas fa-play-circle me-2"></i>بدء المسح
+                            </button>
+                            <button id="stopScanBtn" type="button" class="btn btn-danger" style="display: none;">
+                                <i class="fas fa-stop-circle me-2"></i>إيقاف المسح
+                            </button>
+                        </div>
+                        
+                        <div id="scanStatus"></div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle me-2"></i><strong>تلميح:</strong> تأكد من منح أذونات الكاميرا للمتصفح، ويفضل استخدام HTTPS.
+                        </div>
+                    </div>
+
+                    <!-- محتوى رفع الصورة -->
+                    <div class="scan-content" id="image-content">
+                        <div class="text-center mb-3">
+                            <p class="text-muted">ارفع صورة تحتوي على رمز QR لاستخراجه</p>
+                        </div>
+                        
+                        <div class="image-upload-area" id="uploadArea">
+                            <div class="upload-icon"><i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #007bff;"></i></div>
+                            <h4>اسحب وأفلت الصورة هنا</h4>
+                            <p class="text-muted">أو انقر لاختيار ملف</p>
+                            <input type="file" id="qrImageInput" accept="image/*" style="display: none;">
+                        </div>
+                        
+                        <div class="selected-file-info" id="fileInfo">
+                            <strong><i class="fas fa-file-image me-2"></i>الملف المختار:</strong> <span id="fileName"></span>
+                            <button type="button" class="btn btn-sm btn-outline-danger float-end" id="clearFileBtn">
+                                <i class="fas fa-times me-1"></i>إلغاء
+                            </button>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <button id="scanImageBtn" type="button" class="btn btn-primary btn-lg" disabled>
+                                <i class="fas fa-search me-2"></i>تحليل الصورة
+                            </button>
+                        </div>
+                        
+                        <div id="imageStatus"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- تحميل المكتبات مع CDN بديل -->
+    <script>
+        // تحميل المكتبة مع fallback
+        (function() {
+            const script = document.createElement('script');
+            script.onload = function() {
+                console.log('✅ المكتبة حُملت بنجاح من CDN 1');
+            };
+            script.onerror = function() {
+                console.warn('⚠️ فشل CDN 1، جارٍ المحاولة مع CDN 2...');
+                const script2 = document.createElement('script');
+                script2.onload = function() {
+                    console.log('✅ المكتبة حُملت من CDN 2');
+                };
+                script2.onerror = function() {
+                    console.error('❌ فشل تحميل المكتبة من جميع المصادر!');
+                    alert('⚠️ لا يمكن تحميل مكتبة مسح QR. يرجى التحقق من الإنترنت أو استخدام خيار "الإدخال اليدوي".');
+                };
+                script2.src = 'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+                document.head.appendChild(script2);
+            };
+            script.src = 'https://unpkg.com/html5-qrcode@2.3.10/html5-qrcode.min.js';
+            document.head.appendChild(script);
+        })();
+    </script>
+    <script src="/js/barcode-scanner-fixed.js"></script>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>

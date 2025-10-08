@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-wrapper {
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+        }
+        .admin-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .filter-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .filter-card .form-control, .filter-card .btn {
+            height: 50px;
+            border-radius: 10px;
+        }
+        .admin-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .table-admin {
+            margin: 0;
+        }
+        .table-admin thead {
+            background: #f8f9fa;
+        }
+        .table-admin thead th {
+            padding: 15px;
+            color: #dc3545;
+            font-weight: 600;
+            border: none;
+        }
+        .table-admin tbody tr {
+            transition: all 0.3s ease;
+        }
+        .table-admin tbody tr:hover {
+            background: #f8f9fa;
+        }
+        .table-admin tbody td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+        .user-avatar-admin {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .status-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+        .pagination-admin {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 25px;
+        }
+        .page-link-admin {
+            padding: 10px 15px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #dc3545;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .page-link-admin:hover, .page-link-admin.active {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'admin', user: user}) %>
+    
+    <div class="admin-wrapper">
+        <div class="container">
+            <!-- Admin Header -->
+            <div class="admin-header">
+                <h1>
+                    <i class="fas fa-users-cog me-2"></i>
+                    إدارة المستخدمين
+                </h1>
+                <p class="mb-0" style="opacity: 0.95;">
+                    <i class="fas fa-list me-2"></i>
+                    إدارة جميع مستخدمي النظام وتحديث حالاتهم
+                </p>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="filter-card">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-7">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: #dc3545; color: white; border: none;">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" name="search" placeholder="ابحث بالاسم أو البريد الإلكتروني..." 
+                                   value="<%= search %>" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="limit" class="form-control" onchange="this.form.submit()">
+                            <option value="10" <%= limit == 10 ? 'selected' : '' %>>10 نتائج</option>
+                            <option value="25" <%= limit == 25 ? 'selected' : '' %>>25 نتيجة</option>
+                            <option value="50" <%= limit == 50 ? 'selected' : '' %>>50 نتيجة</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="fas fa-filter me-2"></i>بحث
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Users Table -->
+            <div class="admin-card">
+                <% if (users.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table-admin table table-hover">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-user me-2"></i>المستخدم</th>
+                                    <th><i class="fas fa-envelope me-2"></i>البريد الإلكتروني</th>
+                                    <th><i class="fas fa-shield-alt me-2"></i>حالة الاشتراك</th>
+                                    <th><i class="fas fa-calendar me-2"></i>تاريخ التسجيل</th>
+                                    <th class="text-center"><i class="fas fa-cogs me-2"></i>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% users.forEach(user => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="user-avatar-admin">
+                                                    <%= user.username.charAt(0).toUpperCase() %>
+                                                </div>
+                                                <strong style="color: #dc3545;"><%= user.username %></strong>
+                                            </div>
+                                        </td>
+                                        <td><%= user.email %></td>
+                                        <td>
+                                            <span class="badge <%= user.subscription.status === 'active' ? 'bg-success' : user.subscription.status === 'pending' ? 'bg-warning text-dark' : 'bg-danger' %>">
+                                                <i class="fas <%= user.subscription.status === 'active' ? 'fa-check-circle' : user.subscription.status === 'pending' ? 'fa-clock' : 'fa-times-circle' %> me-1"></i>
+                                                <%= user.subscription.status === 'active' ? 'نشط' : user.subscription.status === 'pending' ? 'قيد المراجعة' : 'غير نشط' %>
+                                            </span>
+                                        </td>
+                                        <td><small><%= new Date(user.createdAt).toLocaleDateString('ar-SA') %></small></td>
+                                        <td>
+                                            <div class="d-flex gap-2 justify-content-center align-items-center flex-wrap">
+                                                <select class="status-select" data-user-id="<%= user._id %>" style="width: auto;">
+                                                    <option value="active" <%= user.subscription.status === 'active' ? 'selected' : '' %>>✓ نشط</option>
+                                                    <option value="pending" <%= user.subscription.status === 'pending' ? 'selected' : '' %>>⏳ معلق</option>
+                                                    <option value="inactive" <%= user.subscription.status === 'inactive' ? 'selected' : '' %>>✗ غير نشط</option>
+                                                </select>
+                                                <button class="btn btn-sm btn-danger delete-user" data-user-id="<%= user._id %>" data-user-name="<%= user.username %>">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <% if (totalPages > 1) { %>
+                        <div class="pagination-admin p-3">
+                            <% if (currentPage > 1) { %>
+                                <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>" class="page-link-admin">
+                                    <i class="fas fa-chevron-right me-1"></i>السابق
+                                </a>
+                            <% } %>
+                            
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <a href="?page=<%= i %>&limit=<%= limit %>&search=<%= search %>" 
+                                   class="page-link-admin <%= currentPage === i ? 'active' : '' %>">
+                                    <%= i %>
+                                </a>
+                            <% } %>
+                            
+                            <% if (currentPage < totalPages) { %>
+                                <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>" class="page-link-admin">
+                                    التالي<i class="fas fa-chevron-left ms-1"></i>
+                                </a>
+                            <% } %>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <div class="text-center py-5">
+                        <i class="fas fa-users-slash" style="font-size: 80px; color: #dee2e6;"></i>
+                        <h4 class="mt-4 text-muted">لا يوجد مستخدمين</h4>
+                        <p class="text-muted">لم يتم العثور على أي نتائج</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('../partials/footer') %>
+    
+    <script>
+        // Update user status
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', async function() {
+                const userId = this.dataset.userId;
+                const newStatus = this.value;
+                
+                if (confirm('هل تريد تغيير حالة المستخدم؟')) {
+                    try {
+                        const response = await fetch(`/admin/users/${userId}/status`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ status: newStatus })
+                        });
+                        
+                        if (response.ok) {
+                            alert('✅ تم تحديث حالة المستخدم بنجاح');
+                            location.reload();
+                        } else {
+                            alert('❌ فشل تحديث حالة المستخدم');
+                        }
+                    } catch (error) {
+                        alert('❌ حدث خطأ: ' + error.message);
+                    }
+                }
+            });
+        });
+        
+        // Delete user
+        document.querySelectorAll('.delete-user').forEach(button => {
+            button.addEventListener('click', async function() {
+                const userId = this.dataset.userId;
+                const userName = this.dataset.userName;
+                
+                if (confirm(`⚠️ هل أنت متأكد من حذف المستخدم "${userName}"؟\n\nهذا الإجراء لا يمكن التراجع عنه!`)) {
+                    try {
+                        const response = await fetch(`/admin/users/${userId}`, {
+                            method: 'DELETE'
+                        });
+                        
+                        if (response.ok) {
+                            alert('✅ تم حذف المستخدم بنجاح');
+                            location.reload();
+                        } else {
+                            alert('❌ فشل حذف المستخدم');
+                        }
+                    } catch (error) {
+                        alert('❌ حدث خطأ: ' + error.message);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+    
+    <%- include('../partials/footer') %>
+
+    <script>
+        // تحديث حالة المستخدم
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', async function() {
+                const userId = this.dataset.userId;
+                const status = this.value;
+                
+                try {
+                    const response = await fetch(`/admin/users/${userId}/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('تم تحديث حالة المستخدم بنجاح');
+                        location.reload();
+                    } else {
+                        alert('فشل في تحديث حالة المستخدم: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء تحديث حالة المستخدم');
+                }
+            });
+        });
+
+        // حذف المستخدم
+        document.querySelectorAll('.delete-user').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const userName = this.dataset.userName;
+                
+                if (confirm(`هل أنت متأكد من أنك تريد حذف المستخدم "${userName}"؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
+                    fetch(`/admin/users/${userId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('تم حذف المستخدم بنجاح');
+                            location.reload();
+                        } else {
+                            alert('فشل في حذف المستخدم: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('حدث خطأ أثناء حذف المستخدم');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

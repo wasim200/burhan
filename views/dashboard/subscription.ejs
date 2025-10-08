@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الاشتراك - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'subscription', user: user}) %>
+    
+    <div class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>إدارة الاشتراك</h1>
+                <p>اختر الباقة المناسبة لاحتياجاتك وقم بإتمام التحويل البنكي</p>
+            </div>
+
+            <!-- حالة الاشتراك الحالي -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>الاشتراك الحالي</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <h4>اشتراك نشط - الباقة المميزة</h4>
+                        <p>تاريخ الانتهاء: <strong>14/05/2024</strong></p>
+                        <p>حالة الاشتراك: <span class="status-badge status-active">نشط</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- خطط الاشتراك -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>خطط الاشتراك</h3>
+                </div>
+                <div class="card-body">
+                    <div class="pricing-grid row g-3">
+                        <div class="pricing-card col-12 col-md-6 col-lg-4">
+                            <div class="pricing-header">
+                                <h3>الباقة الأساسية</h3>
+                                <div class="price">
+                                    $19
+                                    <span>/شهرياً</span>
+                                </div>
+                            </div>
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check-circle"></i> حتى 5 مستندات شهرية</li>
+                                <li><i class="fas fa-check-circle"></i> 3 تواقيع لكل مستند</li>
+                                <li><i class="fas fa-check-circle"></i> دعم فني عبر البريد الإلكتروني</li>
+                                <li><i class="fas fa-check-circle"></i> تخزين لمدة 6 أشهر</li>
+                            </ul>
+                            <button class="btn btn-secondary" disabled>الباقة الحالية</button>
+                        </div>
+                        
+                        <div class="pricing-card pricing-card-active col-12 col-md-6 col-lg-4">
+                            <div class="pricing-header">
+                                <h3>الباقة المميزة</h3>
+                                <div class="price">
+                                    $49
+                                    <span>/شهرياً</span>
+                                </div>
+                            </div>
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check-circle"></i> حتى 20 مستند شهرياً</li>
+                                <li><i class="fas fa-check-circle"></i> 10 تواقيع لكل مستند</li>
+                                <li><i class="fas fa-check-circle"></i> دعم فني عبر الهاتف</li>
+                                <li><i class="fas fa-check-circle"></i> تخزين لمدة سنة كاملة</li>
+                                <li><i class="fas fa-check-circle"></i> إشعارات بالتجديد</li>
+                            </ul>
+                            <button id="btn-upgrade-premium" class="btn btn-primary">ترقية</button>
+                        </div>
+                        
+                        <div class="pricing-card col-12 col-md-6 col-lg-4">
+                            <div class="pricing-header">
+                                <h3>باقة المؤسسات</h3>
+                                <div class="price">
+                                    $99
+                                    <span>/شهرياً</span>
+                                </div>
+                            </div>
+                            <ul class="pricing-features">
+                                <li><i class="fas fa-check-circle"></i> مستندات غير محدودة</li>
+                                <li><i class="fas fa-check-circle"></i> تواقيع غير محدودة</li>
+                                <li><i class="fas fa-check-circle"></i> دعم فني مخصص 24/7</li>
+                                <li><i class="fas fa-check-circle"></i> تخزين دائم</li>
+                                <li><i class="fas fa-check-circle"></i> إدارة فرق العمل</li>
+                                <li><i class="fas fa-check-circle"></i> تقارير متقدمة</li>
+                            </ul>
+                            <button id="btn-upgrade-enterprise" class="btn btn-primary">ترقية</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نموذج التحويل البنكي (مخفي بشكل افتراضي) -->
+            <div class="card shadow-sm" id="bankTransferForm">
+                <div class="card-header">
+                    <h3>إتمام التحويل البنكي</h3>
+                </div>
+                <div class="card-body">
+                    <form id="bankTransferFormElement" enctype="multipart/form-data">
+                        <input type="hidden" id="selectedPlan" name="plan" value="premium">
+                        
+                        <div class="form-group">
+                            <label for="bankName">اسم البنك</label>
+                            <input type="text" id="bankName" name="bankName" required class="form-control" placeholder="أدخل اسم البنك الذي قمت بالتحويل منه">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="accountNumber">رقم الحساب</label>
+                            <input type="text" id="accountNumber" name="accountNumber" required class="form-control" placeholder="أدخل رقم الحساب الذي قمت بالتحويل منه">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="transferDate">تاريخ التحويل</label>
+                            <input type="date" id="transferDate" name="transferDate" required class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="receiptImage">صورة إيصال التحويل</label>
+                            <input type="file" id="receiptImage" name="receiptImage" accept="image/*,.pdf" required class="form-control">
+                            <small>يسمح بتحميل ملفات الصور (JPEG, JPG, PNG) أو PDF بحد أقصى 5MB</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>معلومات التحويل</label>
+                            <div class="alert alert-info">
+                                <p>يرجى التحويل إلى الحساب البنكي التالي:</p>
+                                <p><strong>اسم البنك:</strong> البنك المركزي اليمني</p>
+                                <p><strong>رقم الحساب:</strong> 1234567890</p>
+                                <p><strong>اسم المستفيد:</strong> نظام التوقيع الرقمي</p>
+                                <p><strong>المبلغ:</strong> $<span id="planAmount">49</span></p>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success">إرسال طلب الاشتراك</button>
+                        <button type="button" onclick="hideBankTransferForm()" class="btn btn-secondary">إلغاء</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- طلبات التحويل السابقة -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>طلبات التحويل السابقة</h3>
+                </div>
+                <div class="card-body">
+                    <div id="transfers-container">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>الباقة</th>
+                                    <th>المبلغ</th>
+                                    <th>اسم البنك</th>
+                                    <th>رقم الحساب</th>
+                                    <th>تاريخ التحويل</th>
+                                    <th>الحالة</th>
+                                    <th>التاريخ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>أساسية</td>
+                                    <td>$19</td>
+                                    <td>البنك الأهلي</td>
+                                    <td>1234-5678-90</td>
+                                    <td>14/03/2024</td>
+                                    <td><span class="status-badge status-active">مقبول</span></td>
+                                    <td>15/03/2024</td>
+                                </tr>
+                                <tr>
+                                    <td>مميزة</td>
+                                    <td>$49</td>
+                                    <td>البنك التجاري</td>
+                                    <td>9876-5432-10</td>
+                                    <td>10/04/2024</td>
+                                    <td><span class="status-badge status-inactive">قيد المراجعة</span></td>
+                                    <td>11/04/2024</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>
+
+    <div id="stripe-status" class="alert alert-info" style="display:none; width:90%; max-width:1200px; margin: 1rem auto;">جارِ التحضير للدفع...</div>
+    <script>
+        // معالجة إرسال نموذج التحويل البنكي
+        document.getElementById('bankTransferFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            
+            try {
+                submitButton.disabled = true;
+                submitButton.textContent = 'جاري الإرسال...';
+                
+                // محاكاة للإرسال إلى الخادم
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                alert('تم إرسال طلب التحويل بنجاح، سيتم تفعيل اشتراكك بعد المراجعة');
+                location.reload();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('حدث خطأ أثناء إرسال طلب التحويل');
+                submitButton.disabled = false;
+                submitButton.textContent = 'إرسال طلب الاشتراك';
+            }
+        });
+
+        // تحميل طلبات التحويل السابقة
+        async function loadTransfers() {
+            try {
+                // محاكاة لجلب البيانات من الخادم
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const container = document.getElementById('transfers-container');
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الباقة</th>
+                                <th>المبلغ</th>
+                                <th>اسم البنك</th>
+                                <th>رقم الحساب</th>
+                                <th>تاريخ التحويل</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>أساسية</td>
+                                <td>$19</td>
+                                <td>البنك الأهلي</td>
+                                <td>1234-5678-90</td>
+                                <td>14/03/2024</td>
+                                <td><span class="status-badge status-active">مقبول</span></td>
+                                <td>15/03/2024</td>
+                            </tr>
+                            <tr>
+                                <td>مميزة</td>
+                                <td>$49</td>
+                                <td>البنك التجاري</td>
+                                <td>9876-5432-10</td>
+                                <td>10/04/2024</td>
+                                <td><span class="status-badge status-inactive">قيد المراجعة</span></td>
+                                <td>11/04/2024</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error loading transfers:', error);
+                const container = document.getElementById('transfers-container');
+                container.innerHTML = '<p>فشل في تحميل طلبات التحويل.</p>';
+            }
+        }
+
+        // إخفاء نموذج التحويل البنكي
+        function hideBankTransferForm() {
+            document.getElementById('bankTransferForm').style.display = 'none';
+        }
+
+        // تحميل طلبات التحويل عند فتح الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTransfers();
+        });
+
+        // تكامل Stripe Checkout عبر API backend
+        (function(){
+          const statusEl = document.getElementById('stripe-status');
+          const btnPremium = document.getElementById('btn-upgrade-premium');
+          const btnEnterprise = document.getElementById('btn-upgrade-enterprise');
+
+          let priceMap = {}; // { basic: priceId, premium: priceId, enterprise: priceId }
+
+          function setStatus(msg, type='info'){
+            statusEl.textContent = msg;
+            statusEl.className = 'alert ' + (type==='error' ? 'alert-danger' : type==='success' ? 'alert-success' : 'alert-info');
+            statusEl.style.display = 'block';
+          }
+
+          async function loadPlans(){
+            try{
+              const res = await fetch('/payment/plans', { credentials: 'include' });
+              const data = await res.json();
+              if(!data.success) throw new Error('failed to load plans');
+              // تحديث الأسعار الظاهرة إذا كانت موجودة في القالب (اختياري)
+              priceMap = (data.plans || []).reduce((acc, p)=>{ acc[p.id]=p.stripePriceId; return acc; }, {});
+            }catch(err){
+              console.error('Failed to load Stripe plans', err);
+              setStatus('تعذر تحميل خطط الدفع. يرجى المحاولة لاحقاً أو استخدام التحويل البنكي.', 'error');
+            }
+          }
+
+          async function startCheckout(planId){
+            try{
+              const priceId = priceMap[planId];
+              if(!priceId){
+                setStatus('لم يتم تهيئة معرف السعر للخطة: ' + planId + '. يرجى مراجعة الإعدادات.', 'error');
+                return;
+              }
+              setStatus('جاري إنشاء جلسة الدفع الآمنة...', 'info');
+              const res = await fetch('/payment/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ priceId })
+              });
+              const data = await res.json();
+              if(!data.success){
+                setStatus('فشل إنشاء جلسة الدفع. حاول مجدداً.', 'error');
+                return;
+              }
+              // إعادة التوجيه إلى صفحة الدفع في Stripe
+              window.location.href = data.url;
+            }catch(err){
+              console.error('Checkout error', err);
+              setStatus('حدث خطأ أثناء بدء عملية الدفع.', 'error');
+            }
+          }
+
+          if(btnPremium){ btnPremium.addEventListener('click', ()=> startCheckout('premium')); }
+          if(btnEnterprise){ btnEnterprise.addEventListener('click', ()=> startCheckout('enterprise')); }
+
+          loadPlans();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بُرهان - الرئيسية</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #136d62 0%, #0a4d45 100%);
+            padding: 100px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease-out;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hero-buttons {
+            animation: fadeInUp 1.2s ease-out;
+        }
+        .btn-hero {
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-hero-primary {
+            background: white;
+            color: #136d62;
+            border: 2px solid white;
+        }
+        .btn-hero-primary:hover {
+            background: transparent;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .btn-hero-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        .btn-hero-secondary:hover {
+            background: white;
+            color: #136d62;
+            transform: translateY(-3px);
+        }
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 35px;
+            color: white;
+        }
+        .step-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            height: 100%;
+        }
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #136d62;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header', {currentPage: 'home', user: user}) %>
+    
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content text-center">
+                <h1 class="hero-title">
+                    <i class="fas fa-shield-alt me-3"></i>
+                    بٌـرهــان
+                </h1>
+                <p class="hero-subtitle">
+                    نظام توقيع رقمي آمن للوثائق والشهادات باستخدام الباركود المشفر
+                    <br>
+                    يضمن مصداقية الوثيقة وسهولة التحقق من صحتها
+                </p>
+                <div class="hero-buttons">
+                    <% if (!user) { %>
+                        <a href="/register" class="btn-hero btn-hero-primary me-3">
+                            <i class="fas fa-user-plus me-2"></i>إنشاء حساب
+                        </a>
+                        <a href="/login" class="btn-hero btn-hero-secondary">
+                            <i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول
+                        </a>
+                    <% } else { %>
+                        <a href="/dashboard" class="btn-hero btn-hero-primary me-3">
+                            <i class="fas fa-th-large me-2"></i>لوحة التحكم
+                        </a>
+                        <a href="/barcode/create" class="btn-hero btn-hero-secondary">
+                            <i class="fas fa-plus-circle me-2"></i>إنشاء باركود
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-star me-2"></i>
+                مميزات النظام
+            </h2>
+            <div class="row g-4">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="h5 mb-3">توقيع آمن</h3>
+                        <p class="mb-0 text-muted">نظام توقيع رقمي مشفر باستخدام أحدث تقنيات التشفير، يضمن حماية وسرية الوثائق.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <h3 class="h5 mb-3">تحقق سهل</h3>
+                        <p class="mb-0 text-muted">إمكانية التحقق من صحة الوثيقة بسهولة عبر مسح الباركود باستخدام أي جهاز محمول.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="h5 mb-3">كفاءة عالية</h3>
+                        <p class="mb-0 text-muted">تبسيط إجراءات التوقيع والتحقق، وتوفير الوقت والجهد في معالجة الوثائق.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="h5 mb-3">إدارة متكاملة</h3>
+                        <p class="mb-0 text-muted">لوحة تحكم شاملة لإدارة جميع الوثائق والباركودات مع تقارير وإحصائيات مفصلة.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works Section -->
+    <section style="background-color: #f8f9fa; padding: 80px 0;">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-cogs me-2"></i>
+                كيفية الاستخدام
+            </h2>
+            <div class="row g-4">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3 class="h5 mb-3">إنشاء حساب</h3>
+                        <p class="mb-0 text-muted">قم بإنشاء حساب جديد وانتظر الموافقة من الإدارة.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3 class="h5 mb-3">توقيع الوثيقة</h3>
+                        <p class="mb-0 text-muted">أدخل محتوى الوثيقة وإنشاء توقيع رقمي ذكي مشفر على شكل باركود.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3 class="h5 mb-3">إرفاق الباركود</h3>
+                        <p class="mb-0 text-muted">حمّل الباركود وأرفقه بالوثيقة وشاركها مع الجهات المعنية.</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h3 class="h5 mb-3">التحقق من الصحة</h3>
+                        <p class="mb-0 text-muted">امسح الباركود للتحقق الفوري من صحة الوثيقة ومصداقيتها.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <%- include('partials/footer') %>
+</body>
+</html>

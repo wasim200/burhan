@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>طباعة الباركود - <%= barcode.documentName %></title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px;
+      background: white;
+    }
+    .print-container {
+      max-width: 800px;
+      margin: 0 auto;
+      border: 2px solid #136d62;
+      padding: 40px;
+      border-radius: 15px;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #136d62;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      color: #136d62;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .header p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+    .qr-section {
+      text-align: center;
+      margin: 40px 0;
+      padding: 30px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    .qr-section img {
+      max-width: 350px;
+      border: 5px solid white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    .info-section {
+      margin-top: 30px;
+    }
+    .info-row {
+      display: flex;
+      padding: 15px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-weight: 600;
+      color: #136d62;
+      width: 200px;
+      flex-shrink: 0;
+    }
+    .info-value {
+      color: #333;
+      word-break: break-all;
+    }
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #136d62;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+    .instructions {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 30px 0;
+      text-align: center;
+    }
+    .instructions h3 {
+      color: #856404;
+      margin-bottom: 10px;
+    }
+    .instructions p {
+      color: #856404;
+      line-height: 1.8;
+    }
+    @media print {
+      body {
+        padding: 0;
+      }
+      .print-container {
+        border: none;
+        padding: 20px;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+    .print-button {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .btn {
+      background: #136d62;
+      color: white;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #0a4d45;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="print-container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🛡️ نظام بٌـرهــان</h1>
+      <p>نظام التوقيع الرقمي الآمن</p>
+    </div>
+
+    <!-- Document Name -->
+    <div style="text-align: center; margin: 30px 0;">
+      <h2 style="color: #136d62; font-size: 1.8rem;"><%= barcode.documentName %></h2>
+    </div>
+
+    <!-- QR Code -->
+    <div class="qr-section">
+      <img src="<%= qrCodeData %>" alt="QR Code">
+      <p style="margin-top: 20px; color: #666; font-weight: 600;">
+        امسح هذا الرمز للتحقق من صحة الوثيقة
+      </p>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <h3>⚠️ تعليمات الاستخدام</h3>
+      <p>
+        استخدم أي تطبيق قارئ QR لمسح الرمز أعلاه، أو قم بزيارة نظام بٌـرهــان<br>
+        وانتقل إلى صفحة "قراءة باركود" لفك تشفير المحتوى والتحقق من التوقيع الرقمي
+      </p>
+    </div>
+
+    <!-- Barcode Information -->
+    <div class="info-section">
+      <h3 style="color: #136d62; margin-bottom: 15px; font-size: 1.3rem;">معلومات الباركود</h3>
+      
+      <div class="info-row">
+        <div class="info-label">📄 اسم الوثيقة:</div>
+        <div class="info-value"><%= barcode.documentName %></div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">🔑 معرف الباركود:</div>
+        <div class="info-value"><code style="background: #f8f9fa; padding: 5px 10px; border-radius: 5px;"><%= barcode._id %></code></div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">📅 تاريخ الإنشاء:</div>
+        <div class="info-value"><%= new Date(barcode.timestamp || barcode.createdAt).toLocaleString('ar-SA') %></div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">👁️ عدد المسح:</div>
+        <div class="info-value"><%= barcode.scannedCount || 0 %> مرة</div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-label">🔐 Hash الوثيقة:</div>
+        <div class="info-value" style="font-size: 12px; font-family: monospace;">
+          <%= barcode.originalHash %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>
+        <strong>نظام بٌـرهــان - التوقيع الرقمي الآمن</strong><br>
+        تم إنشاء هذا الباركود بواسطة نظام التشفير المتقدم<br>
+        جميع الحقوق محفوظة © 2025
+      </p>
+    </div>
+
+    <!-- Print Button (hidden when printing) -->
+    <div class="print-button no-print">
+      <button class="btn" onclick="window.print()">
+        🖨️ طباعة الآن
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Auto print on load (optional - can be commented out)
+    // window.onload = function() {
+    //   setTimeout(function() {
+    //     window.print();
+    //   }, 500);
+    // };
+  </script>
+</body>
+</html>

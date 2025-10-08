@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تعديل الملف الشخصي - نظام التوقيع الرقمي</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+  <style>
+    .profile-edit-wrapper {
+      background: #f8f9fa;
+      min-height: 100vh;
+      padding: 30px 0;
+    }
+    .page-header-profile {
+      background: linear-gradient(135deg, #136d62, #0a4d45);
+      color: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(19, 109, 98, 0.3);
+    }
+    .page-header-profile h1 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    .profile-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-bottom: 25px;
+    }
+    .card-header-profile {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      padding: 20px 30px;
+      border-bottom: 3px solid #136d62;
+    }
+    .card-header-profile h3 {
+      color: #136d62;
+      margin: 0;
+      font-size: 1.3rem;
+    }
+    .input-group-profile {
+      margin-bottom: 20px;
+    }
+    .input-group-profile label {
+      font-weight: 600;
+      color: #136d62;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .input-group-profile input {
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 12px 15px;
+      transition: all 0.3s ease;
+    }
+    .input-group-profile input:focus {
+      border-color: #136d62;
+      box-shadow: 0 0 0 0.2rem rgba(19, 109, 98, 0.15);
+    }
+    .avatar-preview-box {
+      border: 3px dashed #dee2e6;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      background: #f8f9fa;
+      transition: all 0.3s ease;
+    }
+    .avatar-preview-box:hover {
+      border-color: #136d62;
+      background: #f0f9f8;
+    }
+    .avatar-preview-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid white;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    .alert-custom {
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .alert-custom i {
+      font-size: 20px;
+    }
+    .btn-save {
+      background: linear-gradient(135deg, #136d62, #0a4d45);
+      color: white;
+      border: none;
+      padding: 12px 35px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(19, 109, 98, 0.4);
+      color: white;
+    }
+    .btn-cancel {
+      background: white;
+      color: #136d62;
+      border: 2px solid #136d62;
+      padding: 12px 35px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .btn-cancel:hover {
+      background: #136d62;
+      color: white;
+    }
+    .password-section {
+      background: #fff9e6;
+      border-left: 4px solid #ffc107;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 25px;
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/header', {currentPage: 'profile', user: user}) %>
+
+  <div class="profile-edit-wrapper">
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header-profile">
+        <h1>
+          <i class="fas fa-user-edit me-2"></i>
+          تعديل الملف الشخصي
+        </h1>
+        <p class="mb-0" style="opacity: 0.95;">
+          <i class="fas fa-cog me-2"></i>
+          تحديث معلومات حسابك وكلمة المرور
+        </p>
+      </div>
+
+      <!-- Alerts -->
+      <% if (error) { %>
+        <div class="alert-custom alert-danger">
+          <i class="fas fa-exclamation-circle"></i>
+          <span><%= error %></span>
+        </div>
+      <% } %>
+      <% if (message) { %>
+        <div class="alert-custom alert-success">
+          <i class="fas fa-check-circle"></i>
+          <span><%= message %></span>
+        </div>
+      <% } %>
+
+      <!-- Basic Info Card -->
+      <div class="profile-card">
+        <div class="card-header-profile">
+          <h3>
+            <i class="fas fa-id-card me-2"></i>
+            البيانات الأساسية
+          </h3>
+        </div>
+        <div class="card-body p-4">
+          <form action="/profile" method="POST" enctype="multipart/form-data" id="profileForm">
+            <div class="row g-4">
+              <!-- Username -->
+              <div class="col-12 col-md-6">
+                <div class="input-group-profile">
+                  <label for="username">
+                    <i class="fas fa-user"></i>
+                    اسم المستخدم
+                  </label>
+                  <input type="text" id="username" name="username" class="form-control" 
+                         value="<%= user.username %>" required minlength="3" maxlength="50" 
+                         pattern="[a-zA-Z0-9_]+">
+                  <small class="text-muted">حروف إنجليزية وأرقام فقط</small>
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="col-12 col-md-6">
+                <div class="input-group-profile">
+                  <label for="email">
+                    <i class="fas fa-envelope"></i>
+                    البريد الإلكتروني
+                  </label>
+                  <input type="email" id="email" name="email" class="form-control" 
+                         value="<%= user.email %>" required>
+                  <small class="text-muted">سيتم استخدامه لتسجيل الدخول</small>
+                </div>
+              </div>
+
+              <!-- Phone -->
+              <div class="col-12 col-md-6">
+                <div class="input-group-profile">
+                  <label for="phone">
+                    <i class="fas fa-phone"></i>
+                    رقم الهاتف <span class="text-muted">(اختياري)</span>
+                  </label>
+                  <input type="tel" id="phone" name="phone" class="form-control" 
+                         value="<%= user.phone || '' %>" placeholder="مثال: 77xxxxxxxx">
+                </div>
+              </div>
+
+              <!-- Avatar Upload -->
+              <div class="col-12 col-md-6">
+                <div class="input-group-profile">
+                  <label for="avatar">
+                    <i class="fas fa-image"></i>
+                    الصورة الرمزية <span class="text-muted">(اختياري)</span>
+                  </label>
+                  <input type="file" id="avatar" name="avatar" class="form-control" accept="image/*">
+                  <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    الحد الأقصى 2MB. الصيغ: JPG, PNG, WEBP, GIF
+                  </small>
+                </div>
+              </div>
+
+              <!-- Avatar Preview -->
+              <div class="col-12">
+                <div class="avatar-preview-box">
+                  <div class="text-muted mb-3">
+                    <i class="fas fa-eye me-2"></i>
+                    المعاينة:
+                  </div>
+                  <% if (user.avatarUrl) { %>
+                    <img id="avatarPreview" src="<%= user.avatarUrl %>" alt="avatar" class="avatar-preview-img">
+                  <% } else { %>
+                    <div style="display: inline-block; position: relative;">
+                      <i class="fas fa-user-circle" style="font-size: 120px; color: #dee2e6;"></i>
+                      <img id="avatarPreview" src="/images/avatar-placeholder.png" alt="avatar" 
+                           class="avatar-preview-img" style="display: none;">
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Password Section -->
+            <div class="password-section">
+              <h4 style="color: #856404; margin-bottom: 15px;">
+                <i class="fas fa-key me-2"></i>
+                تغيير كلمة المرور <span style="font-size: 14px; font-weight: normal;">(اختياري)</span>
+              </h4>
+              <div class="row g-3">
+                <div class="col-12 col-md-4">
+                  <div class="input-group-profile">
+                    <label for="currentPassword">
+                      <i class="fas fa-lock"></i>
+                      كلمة المرور الحالية
+                    </label>
+                    <input type="password" id="currentPassword" name="currentPassword" 
+                           class="form-control" placeholder="••••••••">
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="input-group-profile">
+                    <label for="newPassword">
+                      <i class="fas fa-unlock-alt"></i>
+                      كلمة المرور الجديدة
+                    </label>
+                    <input type="password" id="newPassword" name="newPassword" 
+                           class="form-control" minlength="6" placeholder="6 أحرف على الأقل">
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="input-group-profile">
+                    <label for="confirmPassword">
+                      <i class="fas fa-check-double"></i>
+                      تأكيد كلمة المرور
+                    </label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" 
+                           class="form-control" minlength="6" placeholder="أعد الإدخال">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-3 mt-4 flex-wrap">
+              <button type="submit" class="btn-save">
+                <i class="fas fa-save me-2"></i>
+                حفظ التغييرات
+              </button>
+              <a href="/dashboard" class="btn-cancel">
+                <i class="fas fa-times me-2"></i>
+                إلغاء
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+  
+  <script>
+    // Avatar preview
+    const avatarInput = document.getElementById('avatar');
+    const avatarPreview = document.getElementById('avatarPreview');
+    
+    if (avatarInput && avatarPreview) {
+      avatarInput.addEventListener('change', function() {
+        const file = this.files && this.files[0];
+        if (file) {
+          // Check file size (2MB max)
+          if (file.size > 2 * 1024 * 1024) {
+            alert('⚠️ حجم الصورة يجب أن يكون أقل من 2MB');
+            this.value = '';
+            return;
+          }
+          
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            avatarPreview.src = e.target.result;
+            avatarPreview.style.display = 'block';
+            avatarPreview.style.opacity = '1';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    
+    // Password validation
+    const form = document.getElementById('profileForm');
+    const newPassword = document.getElementById('newPassword');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const currentPassword = document.getElementById('currentPassword');
+    
+    form.addEventListener('submit', function(e) {
+      // Check if user wants to change password
+      if (newPassword.value || confirmPassword.value || currentPassword.value) {
+        if (!currentPassword.value) {
+          e.preventDefault();
+          alert('⚠️ يجب إدخال كلمة المرور الحالية');
+          currentPassword.focus();
+          return;
+        }
+        
+        if (newPassword.value !== confirmPassword.value) {
+          e.preventDefault();
+          alert('⚠️ كلمة المرور الجديدة وتأكيدها غير متطابقتين');
+          confirmPassword.focus();
+          return;
+        }
+        
+        if (newPassword.value.length < 6) {
+          e.preventDefault();
+          alert('⚠️ كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل');
+          newPassword.focus();
+          return;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

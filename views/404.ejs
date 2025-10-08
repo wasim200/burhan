@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - الصفحة غير موجودة</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .error-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #136d62 0%, #0a4d45 100%);
+            padding: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .error-wrapper::before {
+            content: '404';
+            position: absolute;
+            font-size: 30rem;
+            font-weight: 900;
+            color: rgba(255,255,255,0.03);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+        .error-card {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .error-icon {
+            font-size: 100px;
+            color: #136d62;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .error-code {
+            font-size: 6rem;
+            font-weight: 900;
+            color: #136d62;
+            margin: 20px 0;
+            line-height: 1;
+        }
+        .error-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .error-text {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        .btn-group-custom {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-custom {
+            padding: 15px 35px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            border: none;
+        }
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(19, 109, 98, 0.4);
+            color: white;
+        }
+        .btn-secondary-custom {
+            background: white;
+            color: #136d62;
+            border: 2px solid #136d62;
+        }
+        .btn-secondary-custom:hover {
+            background: #136d62;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .error-card {
+                padding: 40px 20px;
+            }
+            .error-code {
+                font-size: 4rem;
+            }
+            .error-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <div class="error-wrapper">
+        <div class="container">
+            <div class="error-card">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="error-code">404</div>
+                <h1 class="error-title">الصفحة غير موجودة</h1>
+                <p class="error-text">
+                    عذراً، الصفحة التي تبحث عنها غير موجودة أو قد تم نقلها.<br>
+                    يمكنك العودة إلى الصفحة الرئيسية أو لوحة التحكم.
+                </p>
+                <div class="btn-group-custom">
+                    <a href="/" class="btn-custom btn-primary-custom">
+                        <i class="fas fa-home"></i>
+                        الصفحة الرئيسية
+                    </a>
+                    <a href="/dashboard" class="btn-custom btn-secondary-custom">
+                        <i class="fas fa-th-large"></i>
+                        لوحة التحكم
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('partials/footer') %>
+</body>
+</html>

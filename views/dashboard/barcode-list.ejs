@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الباركودات الصادرة - نظام التوقيع الرقمي</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+  <style>
+    .list-wrapper {
+      background: #f8f9fa;
+      min-height: 100vh;
+      padding: 30px 0;
+    }
+    .page-header {
+      background: linear-gradient(135deg, #136d62, #0a4d45);
+      color: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(19, 109, 98, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .page-header h1 {
+      font-size: 1.8rem;
+      margin: 0;
+    }
+    .btn-create-new {
+      background: white;
+      color: #136d62;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .btn-create-new:hover {
+      background: #f8f9fa;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255,255,255,0.3);
+      color: #136d62;
+    }
+    .list-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+      border: none;
+    }
+    .card-header-custom {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      padding: 20px 30px;
+      border-bottom: 3px solid #136d62;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-header-custom h3 {
+      color: #136d62;
+      margin: 0;
+      font-size: 1.3rem;
+    }
+    .search-box {
+      position: relative;
+      width: 300px;
+    }
+    .search-box input {
+      padding: 8px 15px 8px 40px;
+      border: 2px solid #136d62;
+      border-radius: 25px;
+      width: 100%;
+    }
+    .search-box i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #136d62;
+    }
+    .table-custom {
+      margin: 0;
+    }
+    .table-custom thead {
+      background: #f8f9fa;
+    }
+    .table-custom thead th {
+      border: none;
+      color: #136d62;
+      font-weight: 600;
+      padding: 15px;
+      white-space: nowrap;
+    }
+    .table-custom tbody tr {
+      transition: all 0.3s ease;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .table-custom tbody tr:hover {
+      background: #f8f9fa;
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .table-custom tbody td {
+      padding: 15px;
+      vertical-align: middle;
+    }
+    .badge-custom {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-scans {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      color: #136d62;
+    }
+    .btn-action {
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 2px solid;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-view {
+      background: white;
+      color: #136d62;
+      border-color: #136d62;
+    }
+    .btn-view:hover {
+      background: #136d62;
+      color: white;
+    }
+    .btn-print {
+      background: white;
+      color: #28a745;
+      border-color: #28a745;
+    }
+    .btn-print:hover {
+      background: #28a745;
+      color: white;
+    }
+    .btn-delete {
+      background: white;
+      color: #dc3545;
+      border-color: #dc3545;
+    }
+    .btn-delete:hover {
+      background: #dc3545;
+      color: white;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .empty-icon {
+      font-size: 80px;
+      color: #dee2e6;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 768px) {
+      .page-header {
+        text-align: center;
+      }
+      .page-header h1 {
+        font-size: 1.5rem;
+      }
+      .search-box {
+        width: 100%;
+      }
+      .card-header-custom {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/header', {currentPage: 'barcode-list', user: user}) %>
+
+  <div class="list-wrapper">
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <h1>
+            <i class="fas fa-list-alt me-2"></i>
+            الباركودات الصادرة
+          </h1>
+          <p class="mb-0" style="opacity: 0.95;">
+            <i class="fas fa-folder-open me-2"></i>
+            إدارة جميع الباركودات التي قمت بإنشائها
+          </p>
+        </div>
+        <a href="/barcode/create" class="btn-create-new">
+          <i class="fas fa-plus-circle me-2"></i>
+          إنشاء باركود جديد
+        </a>
+      </div>
+
+      <!-- List Card -->
+      <div class="list-card">
+        <div class="card-header-custom">
+          <h3>
+            <i class="fas fa-qrcode me-2"></i>
+            القائمة الكاملة
+          </h3>
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="ابحث عن وثيقة..." class="form-control">
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table-custom table" id="barcodesTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th><i class="fas fa-file-alt me-1"></i> الوثيقة</th>
+                  <th><i class="fas fa-fingerprint me-1"></i> المعرف</th>
+                  <th><i class="fas fa-calendar me-1"></i> التاريخ</th>
+                  <th><i class="fas fa-eye me-1"></i> مرات المسح</th>
+                  <th class="text-center"><i class="fas fa-cogs me-1"></i> إجراءات</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (Array.isArray(barcodes) && barcodes.length) { %>
+                  <% barcodes.forEach(function(bc, idx){ %>
+                    <tr class="barcode-row" data-name="<%= bc.documentName.toLowerCase() %>">
+                      <td><strong><%= idx + 1 %></strong></td>
+                      <td>
+                        <i class="fas fa-qrcode me-2" style="color: #136d62;"></i>
+                        <strong><%= bc.documentName %></strong>
+                      </td>
+                      <td>
+                        <code style="background: #f8f9fa; padding: 4px 8px; border-radius: 5px; font-size: 12px;">
+                          <%= bc._id %>
+                        </code>
+                      </td>
+                      <td>
+                        <small><%= new Date(bc.createdAt || bc.timestamp).toLocaleString('ar-SA') %></small>
+                      </td>
+                      <td>
+                        <span class="badge-custom badge-scans">
+                          <i class="fas fa-eye me-1"></i>
+                          <%= bc.scannedCount || 0 %> مرة
+                        </span>
+                      </td>
+                      <td class="text-center">
+                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                          <a href="/barcode/view/<%= bc._id %>" class="btn-action btn-view">
+                            <i class="fas fa-eye"></i>
+                            عرض
+                          </a>
+                          <a href="/barcode/print/<%= bc._id %>" class="btn-action btn-print" target="_blank">
+                            <i class="fas fa-print"></i>
+                            طباعة
+                          </a>
+                          <button type="button" class="btn-action btn-delete" onclick="confirmDelete('<%= bc._id %>')">
+                            <i class="fas fa-trash"></i>
+                            حذف
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="6">
+                      <div class="empty-state">
+                        <div class="empty-icon">
+                          <i class="fas fa-inbox"></i>
+                        </div>
+                        <h4 style="color: #6c757d;">لا توجد باركودات حتى الآن</h4>
+                        <p style="color: #999;">ابدأ بإنشاء أول باركود لوثائقك</p>
+                        <a href="/barcode/create" class="btn-create-new" style="display: inline-block; margin-top: 15px;">
+                          <i class="fas fa-plus-circle me-2"></i>
+                          إنشاء باركود الآن
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+  
+  <script>
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.barcode-row');
+        
+        rows.forEach(row => {
+          const name = row.dataset.name;
+          if (name.includes(searchTerm)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Delete confirmation and execution
+    async function confirmDelete(id) {
+      if (!confirm('⚠️ هل أنت متأكد من حذف هذا الباركود؟\n\nلن تتمكن من استعادته بعد الحذف!')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/barcode/delete/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('✅ ' + result.message);
+          // إعادة تحميل الصفحة لإظهار التحديثات
+          window.location.reload();
+        } else {
+          alert('❌ ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error deleting barcode:', error);
+        alert('❌ حدث خطأ أثناء حذف الباركود');
+      }
+    }
+  </script>
+</body>
+</html>

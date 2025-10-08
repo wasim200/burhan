@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شروط الاستخدام - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <%- include('partials/header', {currentPage: 'terms', user: user}) %>
+    
+    <div class="container" style="margin-top: 3rem; margin-bottom: 3rem;">
+        <div class="card">
+            <div class="card-header">
+                <h1 style="color: rgb(255, 255, 255);">شروط الاستخدام</h1>
+            </div>
+            <div class="card-body">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <p style="color: var(--text-muted);">آخر تحديث: <%= new Date().toLocaleDateString('ar-SA') %></p>
+                </div>
+                
+                <h2>1. قبول الشروط</h2>
+                <p>باستخدامك لنظام التوقيع الرقمي "برهان"، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على أي من هذه الشروط، يرجى عدم استخدام الخدمة.</p>
+                
+                <h2>2. وصف الخدمة</h2>
+                <p>نظام "برهان" هو منصة إلكترونية متخصصة في توقيع والتحقق من صحة الوثائق الحكومية باستخدام تقنيات التشفير المتقدمة والباركود المشفر.</p>
+                
+                <h2>3. استخدام الخدمة</h2>
+                <ul>
+                    <li>يجب أن تكون 18 عاماً أو أكثر لاستخدام هذه الخدمة</li>
+                    <li>يجب توفير معلومات صحيحة ودقيقة عند التسجيل</li>
+                    <li>يجب الحفاظ على سرية كلمة المرور الخاصة بك</li>
+                    <li>يُمنع استخدام الخدمة لأغراض غير قانونية أو ضارة</li>
+                </ul>
+                
+                <h2>4. التوقيع الرقمي</h2>
+                <p>التوقيعات الرقمية المنشأة من خلال النظام لها نفس القوة القانونية للتوقيعات اليدوية وفقاً للقوانين المعمول بها في الجمهورية اليمنية.</p>
+                
+                <h2>5. الخصوصية والأمان</h2>
+                <p>نحن نلتزم بحماية خصوصيتك وأمان بياناتك. جميع البيانات يتم تشفيرها باستخدام أحدث تقنيات التشفير المتاحة.</p>
+                
+                <h2>6. المسؤولية</h2>
+                <p>المستخدم مسؤول عن جميع الأنشطة التي تتم من خلال حسابه. نحن غير مسؤولين عن أي أضرار قد تنتج عن سوء استخدام الخدمة.</p>
+                
+                <h2>7. تعديل الشروط</h2>
+                <p>نحتفظ بالحق في تعديل هذه الشروط في أي وقت. سيتم إشعار المستخدمين بأي تغييرات جوهرية.</p>
+                
+                <h2>8. الاتصال</h2>
+                <p>إذا كان لديك أي استفسارات حول هذه الشروط، يرجى التواصل معنا عبر البريد الإلكتروني: wasimjunaid15@gmail.com</p>
+                
+                <div style="text-align: center; margin-top: 3rem;">
+                    <a href="/register" class="btn btn-primary">العودة للتسجيل</a>
+                    <a href="/" class="btn btn-secondary" style="margin-right: 1rem;">العودة للرئيسية</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('partials/footer') %>
+</body>
+</html>

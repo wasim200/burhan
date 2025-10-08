@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطأ في الخادم</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <div class="container">
+        <h1>خطأ في الخادم</h1>
+        <p><%= message %></p>
+        
+        <% if (error && Object.keys(error).length !== 0) { %>
+            <pre><%= error.stack %></pre>
+        <% } %>
+        
+        <a href="/" class="btn btn-primary">العودة إلى الصفحة الرئيسية</a>
+    </div>
+    
+    <%- include('partials/footer') %>
+</body>
+</html>

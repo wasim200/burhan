@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - بٌـرهــان</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <style>
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #136d62 0%, #0a4d45 100%);
+            padding: 40px 0;
+        }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        .login-header {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .login-header i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .login-body {
+            padding: 40px 30px;
+        }
+        .input-group-custom {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .input-group-custom input {
+            padding-right: 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            height: 50px;
+            transition: all 0.3s ease;
+        }
+        .input-group-custom input:focus {
+            border-color: #136d62;
+            box-shadow: 0 0 0 0.2rem rgba(19, 109, 98, 0.15);
+        }
+        .input-group-custom .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 18px;
+            pointer-events: none;
+        }
+        .input-group-custom input:focus ~ .input-icon {
+            color: #136d62;
+        }
+        .toggle-password {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+            z-index: 10;
+        }
+        .toggle-password:hover {
+            color: #136d62;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            border: none;
+            height: 55px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(19, 109, 98, 0.4);
+        }
+        .alert-custom {
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-custom i {
+            font-size: 20px;
+        }
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #999;
+            font-size: 14px;
+        }
+        .forgot-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .forgot-link a {
+            color: #136d62;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 576px) {
+            .login-header {
+                padding: 30px 20px;
+            }
+            .login-body {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header', {currentPage: 'login', user: user}) %>
+    
+    <div class="login-wrapper">
+        <div class="container">
+            <div class="login-card">
+                <div class="login-header">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <h2 class="mb-0">تسجيل الدخول</h2>
+                    <p class="mb-0 mt-2" style="opacity: 0.9;">أهلاً بعودتك إلى نظام بٌـرهــان</p>
+                </div>
+                
+                <div class="login-body">
+            
+                    <% if (error) { %>
+                        <div class="alert-custom alert-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span><%= error %></span>
+                        </div>
+                    <% } %>
+                    
+                    <% if (message) { %>
+                        <div class="alert-custom alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <span><%= message %></span>
+                        </div>
+                    <% } %>
+                    
+                    <form action="/login" method="POST" id="loginForm">
+                        <!-- البريد الإلكتروني -->
+                        <div class="input-group-custom">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-control" 
+                                required
+                                placeholder="أدخل البريد الإلكتروني">
+                            <i class="fas fa-envelope input-icon"></i>
+                        </div>
+                        
+                        <!-- كلمة المرور -->
+                        <div class="input-group-custom">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-control" 
+                                required
+                                placeholder="أدخل كلمة المرور">
+                            <i class="fas fa-lock input-icon"></i>
+                            <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                        </div>
+                        
+                        <!-- زر تسجيل الدخول -->
+                        <button type="submit" class="btn btn-primary btn-login w-100">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            تسجيل الدخول
+                        </button>
+                        
+                        <!-- رابط نسيت كلمة المرور -->
+                        <div class="forgot-link">
+                            <a href="/forgot-password">
+                                <i class="fas fa-key me-1"></i>
+                                نسيت كلمة المرور؟
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <div class="divider">
+                        <span>أو</span>
+                    </div>
+                    
+                    <p class="text-center mb-0">
+                        <i class="fas fa-user-plus me-2" style="color: #136d62;"></i>
+                        ليس لديك حساب؟ 
+                        <a href="/register" style="color: #136d62; font-weight: 600; text-decoration: none;">
+                            إنشاء حساب جديد
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('partials/footer') %>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const password = document.getElementById('password');
+            
+            // إظهار/إخفاء كلمة المرور
+            togglePassword.addEventListener('click', function() {
+                const type = password.type === 'password' ? 'text' : 'password';
+                password.type = type;
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        });
+    </script>
+</body>
+</html>

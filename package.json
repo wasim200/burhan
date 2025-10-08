@@ -1,0 +1,30 @@
+{
+  "name": "electronic-signature-system",
+  "version": "1.0.0",
+  "description": "نظام التوقيع الرقمي للوثائق الحكومية",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "mocha --recursive"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-mongo": "^5.1.0",
+    "cookie-parser": "^1.4.7",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.1",
+    "multer": "^1.4.5-lts.1",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "mocha": "^10.8.2",
+    "nodemon": "^3.0.2"
+  }
+}
