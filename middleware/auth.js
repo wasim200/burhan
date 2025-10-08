@@ -6,26 +6,34 @@ exports.protect = async (req, res, next) => {
   try {
     let token;
 
- 
-
     // التحقق من وجود التوكن في الرأس
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
-      console.log('protect: token found in Authorization header');
+      console.log('✅ protect: token found in Authorization header');
     }
     // أو التحقق من وجود التوكن في الكوكيز (الان يتم تعيينه في /login)
     else if (req.cookies && req.cookies.token) {
       token = req.cookies.token;
-      console.log('protect: token found in cookie');
+      console.log('✅ protect: token found in cookie');
     }
     // أو التحقق من وجود التوكن في الجلسة (fallback)
     else if (req.session && req.session.token) {
       token = req.session.token;
-      console.log('protect: token found in session');
+      console.log('✅ protect: token found in session');
     }
 
     // التأكد من وجود التوكن
     if (!token) {
+      console.log('❌ protect: no token found');
+      console.log('   cookies:', req.cookies);
+      console.log('   session:', req.session);
+      console.log('   headers.authorization:', req.headers.authorization);
+      
+      // إذا كان الطلب HTML، أعد التوجيه لصفحة تسجيل الدخول
+      if (req.accepts(['html', 'json']) === 'html') {
+        return res.redirect('/login?message=الرجاء تسجيل الدخول للوصول إلى هذه الصفحة');
+      }
+      
       return res.status(401).json({
         success: false,
         message: 'غير مصرح بالوصول، يرجى تسجيل الدخول'
@@ -34,27 +42,37 @@ exports.protect = async (req, res, next) => {
 
     try {
       // التحقق من صحة التوكن
-  const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_jwt_secret');
-  console.log('protect: decoded token id=', decoded && decoded.id);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_jwt_secret');
+      console.log('✅ protect: decoded token id=', decoded && decoded.id);
       
       // الحصول على بيانات المستخدم من التوكن
       req.user = await User.findById(decoded.id);
       
       if (!req.user) {
+        console.log('❌ protect: user not found for id:', decoded.id);
         return res.status(401).json({
           success: false,
           message: 'لم يعد هذا المستخدم موجودًا'
         });
       }
       
+      console.log('✅ protect: user authenticated:', req.user.username);
       next();
     } catch (error) {
+      console.log('❌ protect: token verification failed:', error.message);
+      
+      // إذا كان الطلب HTML، أعد التوجيه لصفحة تسجيل الدخول
+      if (req.accepts(['html', 'json']) === 'html') {
+        return res.redirect('/login?message=جلسة العمل منتهية، الرجاء تسجيل الدخول مرة أخرى');
+      }
+      
       return res.status(401).json({
         success: false,
         message: 'جلسة العمل غير صالحة، يرجى تسجيل الدخول مرة أخرى'
       });
     }
   } catch (error) {
+    console.log('❌ protect: unexpected error:', error);
     return res.status(500).json({
       success: false,
       message: 'خطأ في المصادقة'
