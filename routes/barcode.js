@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const QRCode = require('qrcode');
+const multer = require('multer');
 const { 
   encryptForBarcode, 
   decryptBarcode, 
@@ -11,6 +12,23 @@ const {
 const Barcode = require('../models/Barcode');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+
+// إعداد multer لرفع الصورات
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5 MB max
+  },
+  fileFilter: function(req, file, cb) {
+    // قبول الصور و PDF فقط
+    if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('نوع الملف غير مدعوم! يُرجى رفع صورة أو PDF فقط'));
+    }
+  }
+});
 
 // ملاحظة: middleware المصادقة يتم تطبيقه في app.js
 
@@ -37,8 +55,8 @@ router.get('/read', (req, res) => {
   }
 });
 
-// إنشاء باركود مشفر
-router.post('/create', async (req, res) => {
+// إنشاء باركود مشفر مع دعم رفع الصورة
+router.post('/create', upload.single('documentImage'), async (req, res) => {
   try {
     const { documentContent, documentName } = req.body;
     const userId = req.user.id;
@@ -64,6 +82,17 @@ router.post('/create', async (req, res) => {
     // إنشاء توقيع رقمي
     const digitalSignature = createDigitalSignature(documentContent, user.privateKey);
 
+    // معالجة الصورة إذا تم رفعها
+    let documentImage = null;
+    let documentImageName = null;
+    
+    if (req.file) {
+      // تحويل الصورة إلى base64
+      documentImage = req.file.buffer.toString('base64');
+      documentImageName = req.file.originalname;
+      console.log('📷 Image uploaded:', documentImageName, '| Size:', (req.file.size / 1024).toFixed(2), 'KB');
+    }
+
     // حفظ الباركود في قاعدة البيانات، مع التوقيع والمفتاح العام للناشر
     const newBarcode = new Barcode({
       userId,
@@ -71,14 +100,15 @@ router.post('/create', async (req, res) => {
       encryptedData,
       originalHash: documentHash,
       digitalSignature,
-      ownerPublicKey: user.publicKey
+      ownerPublicKey: user.publicKey,
+      documentImage,
+      documentImageName
     });
 
     await newBarcode.save();
     console.log('✅ Barcode created for user:', userId, '| Barcode ID:', newBarcode._id);
 
     // لتقليل كثافة رمز QR وجعل المسح أكثر موثوقية، سنشفر فقط معرف السجل
-    // يمكن أيضًا استخدام شكل JSON {id: '<hex>'} لكن سنستخدم المعرف مباشرة لتبسيط القراءة
     const qrPayload = newBarcode._id.toString();
     const qrCodeData = await QRCode.toDataURL(qrPayload);
 
@@ -88,14 +118,16 @@ router.post('/create', async (req, res) => {
       documentName,
       barcodeId: newBarcode._id,
       documentHash,
-      createdAt: new Date()
+      createdAt: new Date(),
+      user: req.user
     });
 
   } catch (error) {
-    console.error('Error creating barcode:', error);
+    console.error('❌ Error creating barcode:', error);
     res.status(500).render('dashboard/barcode-result', {
       success: false,
-      message: 'فشل في إنشاء الباركود'
+      message: 'فشل في إنشاء الباركود: ' + error.message,
+      user: req.user
     });
   }
 });
@@ -187,7 +219,10 @@ router.post('/read', async (req, res) => {
       timestamp: decryptedData.timestamp,
       documentHash: decryptedData.hash,
       signatureValid,
-      scannedCount: barcodeRecord ? barcodeRecord.scannedCount : 0
+      scannedCount: barcodeRecord ? barcodeRecord.scannedCount : 0,
+      documentImage: barcodeRecord ? barcodeRecord.documentImage : null,
+      documentImageName: barcodeRecord ? barcodeRecord.documentImageName : null,
+      user: req.user
     });
 
   } catch (error) {

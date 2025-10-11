@@ -120,6 +120,24 @@
                     </div>
                 </div>
 
+                <% if (typeof documentImage !== 'undefined' && documentImage) { %>
+                <!-- صورة الوثيقة المرفقة -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header" style="background: linear-gradient(135deg, #136d62, #0a4d45); color: white;">
+                        <h3 class="h5 mb-0"><i class="fas fa-image me-2"></i>صورة الوثيقة المرفقة</h3>
+                    </div>
+                    <div class="card-body text-center" style="background: #f8f9fa;">
+                        <img src="data:image/jpeg;base64,<%= documentImage %>" 
+                             alt="صورة الوثيقة" 
+                             style="max-width: 100%; max-height: 600px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                        <p class="mt-3 text-muted">
+                            <i class="fas fa-file-image me-1"></i>
+                            اسم الملف: <%= typeof documentImageName !== 'undefined' ? documentImageName : 'صورة الوثيقة' %>
+                        </p>
+                    </div>
+                </div>
+                <% } %>
+
                 <div class="d-flex justify-content-center gap-2 mt-4">
                     <a href="/barcode/read" class="btn btn-primary"><i class="fas fa-qrcode me-2"></i>قراءة باركود آخر</a>
                     <button onclick="window.print()" class="btn btn-success"><i class="fas fa-print me-2"></i>طباعة النتيجة</button>

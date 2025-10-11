@@ -119,6 +119,52 @@
                 </p>
             </div>
 
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <% 
+                    let activeUsers = users.filter(u => u.status === 'active').length;
+                    let expiringSoon = users.filter(u => u.daysRemaining > 0 && u.daysRemaining <= 7).length;
+                    let expiredUsers = users.filter(u => u.status === 'expired' || u.daysRemaining <= 0).length;
+                    let inactiveUsers = users.filter(u => u.status === 'inactive').length;
+                %>
+                <div class="col-md-3 mb-3">
+                    <div class="card" style="border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+                        <div class="card-body text-center">
+                            <i class="fas fa-check-circle" style="font-size: 40px; margin-bottom: 10px; opacity: 0.9;"></i>
+                            <h3 class="mb-0" style="font-size: 2rem; font-weight: 700;"><%= activeUsers %></h3>
+                            <p class="mb-0" style="opacity: 0.95;">مستخدم نشط</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card" style="border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: linear-gradient(135deg, #ffc107, #ff9800); color: white;">
+                        <div class="card-body text-center">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 40px; margin-bottom: 10px; opacity: 0.9;"></i>
+                            <h3 class="mb-0" style="font-size: 2rem; font-weight: 700;"><%= expiringSoon %></h3>
+                            <p class="mb-0" style="opacity: 0.95;">ينتهي قريباً (≤7 أيام)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card" style="border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: linear-gradient(135deg, #dc3545, #c82333); color: white;">
+                        <div class="card-body text-center">
+                            <i class="fas fa-hourglass-end" style="font-size: 40px; margin-bottom: 10px; opacity: 0.9;"></i>
+                            <h3 class="mb-0" style="font-size: 2rem; font-weight: 700;"><%= expiredUsers %></h3>
+                            <p class="mb-0" style="opacity: 0.95;">اشتراك منتهي</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card" style="border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: linear-gradient(135deg, #6c757d, #5a6268); color: white;">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-slash" style="font-size: 40px; margin-bottom: 10px; opacity: 0.9;"></i>
+                            <h3 class="mb-0" style="font-size: 2rem; font-weight: 700;"><%= inactiveUsers %></h3>
+                            <p class="mb-0" style="opacity: 0.95;">غير مفعّل</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Search & Filter -->
             <div class="filter-card">
                 <form method="GET" class="row g-3">
@@ -156,6 +202,7 @@
                                     <th><i class="fas fa-user me-2"></i>المستخدم</th>
                                     <th><i class="fas fa-envelope me-2"></i>البريد الإلكتروني</th>
                                     <th><i class="fas fa-shield-alt me-2"></i>حالة الاشتراك</th>
+                                    <th class="text-center"><i class="fas fa-hourglass-half me-2"></i>الأيام المتبقية</th>
                                     <th><i class="fas fa-calendar me-2"></i>تاريخ التسجيل</th>
                                     <th class="text-center"><i class="fas fa-cogs me-2"></i>الإجراءات</th>
                                 </tr>
@@ -173,18 +220,55 @@
                                         </td>
                                         <td><%= user.email %></td>
                                         <td>
-                                            <span class="badge <%= user.subscription.status === 'active' ? 'bg-success' : user.subscription.status === 'pending' ? 'bg-warning text-dark' : 'bg-danger' %>">
-                                                <i class="fas <%= user.subscription.status === 'active' ? 'fa-check-circle' : user.subscription.status === 'pending' ? 'fa-clock' : 'fa-times-circle' %> me-1"></i>
-                                                <%= user.subscription.status === 'active' ? 'نشط' : user.subscription.status === 'pending' ? 'قيد المراجعة' : 'غير نشط' %>
+                                            <span class="badge <%= user.status === 'active' ? 'bg-success' : user.status === 'pending' ? 'bg-warning text-dark' : user.status === 'expired' ? 'bg-danger' : 'bg-secondary' %>">
+                                                <i class="fas <%= user.status === 'active' ? 'fa-check-circle' : user.status === 'pending' ? 'fa-clock' : user.status === 'expired' ? 'fa-hourglass-end' : 'fa-times-circle' %> me-1"></i>
+                                                <%= user.status === 'active' ? 'نشط' : user.status === 'pending' ? 'قيد المراجعة' : user.status === 'expired' ? 'منتهي' : 'غير نشط' %>
                                             </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <% if (user.subscription.endDate) { %>
+                                                <% 
+                                                    let badgeClass = '';
+                                                    let icon = '';
+                                                    if (user.daysRemaining > 30) {
+                                                        badgeClass = 'bg-success';
+                                                        icon = 'fa-check-circle';
+                                                    } else if (user.daysRemaining > 7) {
+                                                        badgeClass = 'bg-warning text-dark';
+                                                        icon = 'fa-exclamation-triangle';
+                                                    } else if (user.daysRemaining > 0) {
+                                                        badgeClass = 'bg-danger';
+                                                        icon = 'fa-hourglass-end';
+                                                    } else {
+                                                        badgeClass = 'bg-dark';
+                                                        icon = 'fa-times-circle';
+                                                    }
+                                                %>
+                                                <span class="badge <%= badgeClass %>" style="font-size: 13px; padding: 8px 12px;">
+                                                    <i class="fas <%= icon %> me-1"></i>
+                                                    <strong><%= user.daysRemaining %></strong> يوم
+                                                </span>
+                                                <% if (user.subscription.endDate) { %>
+                                                    <br><small class="text-muted" style="font-size: 11px;">
+                                                        ينتهي: <%= new Date(user.subscription.endDate).toLocaleDateString('ar-SA') %>
+                                                    </small>
+                                                <% } %>
+                                            <% } else { %>
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-minus me-1"></i>غير محدد
+                                                </span>
+                                            <% } %>
                                         </td>
                                         <td><small><%= new Date(user.createdAt).toLocaleDateString('ar-SA') %></small></td>
                                         <td>
                                             <div class="d-flex gap-2 justify-content-center align-items-center flex-wrap">
+                                                <button class="btn btn-sm btn-success activate-user" data-user-id="<%= user._id %>" data-user-name="<%= user.username %>" title="تفعيل المستخدم">
+                                                    <i class="fas fa-check-circle me-1"></i>تفعيل
+                                                </button>
                                                 <select class="status-select" data-user-id="<%= user._id %>" style="width: auto;">
                                                     <option value="active" <%= user.subscription.status === 'active' ? 'selected' : '' %>>✓ نشط</option>
-                                                    <option value="pending" <%= user.subscription.status === 'pending' ? 'selected' : '' %>>⏳ معلق</option>
                                                     <option value="inactive" <%= user.subscription.status === 'inactive' ? 'selected' : '' %>>✗ غير نشط</option>
+                                                    <option value="expired" <%= user.subscription.status === 'expired' ? 'selected' : '' %>>⏰ منتهي</option>
                                                 </select>
                                                 <button class="btn btn-sm btn-danger delete-user" data-user-id="<%= user._id %>" data-user-name="<%= user.username %>">
                                                     <i class="fas fa-trash"></i>
@@ -233,93 +317,122 @@
     
     <%- include('../partials/footer') %>
     
+    <%- include('../partials/footer') %>
+
     <script>
-        // Update user status
-        document.querySelectorAll('.status-select').forEach(select => {
-            select.addEventListener('change', async function() {
-                const userId = this.dataset.userId;
-                const newStatus = this.value;
-                
-                if (confirm('هل تريد تغيير حالة المستخدم؟')) {
-                    try {
-                        const response = await fetch(`/admin/users/${userId}/status`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ status: newStatus })
-                        });
-                        
-                        if (response.ok) {
-                            alert('✅ تم تحديث حالة المستخدم بنجاح');
-                            location.reload();
-                        } else {
-                            alert('❌ فشل تحديث حالة المستخدم');
-                        }
-                    } catch (error) {
-                        alert('❌ حدث خطأ: ' + error.message);
-                    }
-                }
-            });
-        });
-        
-        // Delete user
-        document.querySelectorAll('.delete-user').forEach(button => {
+        // تفعيل المستخدم مع تحديد المدة
+        document.querySelectorAll('.activate-user').forEach(button => {
             button.addEventListener('click', async function() {
                 const userId = this.dataset.userId;
                 const userName = this.dataset.userName;
                 
-                if (confirm(`⚠️ هل أنت متأكد من حذف المستخدم "${userName}"؟\n\nهذا الإجراء لا يمكن التراجع عنه!`)) {
+                // عرض نافذة لإدخال مدة الاشتراك
+                const daysOptions = [
+                    { value: 7, label: '7 أيام (أسبوع)' },
+                    { value: 15, label: '15 يوم' },
+                    { value: 30, label: '30 يوم (شهر)' },
+                    { value: 90, label: '90 يوم (3 أشهر)' },
+                    { value: 180, label: '180 يوم (6 أشهر)' },
+                    { value: 365, label: '365 يوم (سنة)' }
+                ];
+                
+                let optionsHtml = daysOptions.map(opt => 
+                    `<option value="${opt.value}">${opt.label}</option>`
+                ).join('');
+                
+                const promptHtml = `
+                    <div style="font-family: Arial, sans-serif; text-align: center;">
+                        <h3 style="color: #136d62; margin-bottom: 15px;">⚡ تفعيل المستخدم: ${userName}</h3>
+                        <p style="margin-bottom: 20px;">حدد مدة الاشتراك:</p>
+                        <select id="durationSelect" style="width: 100%; padding: 12px; border: 2px solid #136d62; border-radius: 8px; font-size: 16px; margin-bottom: 15px;">
+                            ${optionsHtml}
+                        </select>
+                        <div style="margin-top: 20px;">
+                            <button onclick="confirmActivation()" style="background: #28a745; color: white; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-right: 10px;">
+                                ✅ تفعيل
+                            </button>
+                            <button onclick="closePrompt()" style="background: #dc3545; color: white; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                                ❌ إلغاء
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                const overlay = document.createElement('div');
+                overlay.id = 'activationOverlay';
+                overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center;';
+                
+                const promptBox = document.createElement('div');
+                promptBox.style.cssText = 'background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-width: 500px; width: 90%;';
+                promptBox.innerHTML = promptHtml;
+                
+                overlay.appendChild(promptBox);
+                document.body.appendChild(overlay);
+                
+                // دالة التفعيل
+                window.confirmActivation = async function() {
+                    const durationDays = document.getElementById('durationSelect').value;
+                    
                     try {
-                        const response = await fetch(`/admin/users/${userId}`, {
-                            method: 'DELETE'
+                        const response = await fetch(`/admin/users/${userId}/activate`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ durationDays })
                         });
                         
-                        if (response.ok) {
-                            alert('✅ تم حذف المستخدم بنجاح');
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            alert('✅ ' + data.message);
                             location.reload();
                         } else {
-                            alert('❌ فشل حذف المستخدم');
+                            alert('❌ فشل في تفعيل المستخدم: ' + data.message);
                         }
                     } catch (error) {
-                        alert('❌ حدث خطأ: ' + error.message);
+                        console.error('Error:', error);
+                        alert('❌ حدث خطأ أثناء تفعيل المستخدم');
                     }
-                }
+                    
+                    document.getElementById('activationOverlay').remove();
+                };
+                
+                // دالة الإلغاء
+                window.closePrompt = function() {
+                    document.getElementById('activationOverlay').remove();
+                };
             });
         });
-    </script>
-</body>
-</html>
-    
-    <%- include('../partials/footer') %>
-
-    <script>
+        
         // تحديث حالة المستخدم
         document.querySelectorAll('.status-select').forEach(select => {
             select.addEventListener('change', async function() {
                 const userId = this.dataset.userId;
                 const status = this.value;
                 
-                try {
-                    const response = await fetch(`/admin/users/${userId}/status`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ status })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        alert('تم تحديث حالة المستخدم بنجاح');
-                        location.reload();
-                    } else {
-                        alert('فشل في تحديث حالة المستخدم: ' + data.message);
+                if (confirm('هل تريد تغيير حالة المستخدم؟')) {
+                    try {
+                        const response = await fetch(`/admin/users/${userId}/status`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ status })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            alert('✅ تم تحديث حالة المستخدم بنجاح');
+                            location.reload();
+                        } else {
+                            alert('❌ فشل في تحديث حالة المستخدم: ' + data.message);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('❌ حدث خطأ أثناء تحديث حالة المستخدم');
                     }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('حدث خطأ أثناء تحديث حالة المستخدم');
                 }
             });
         });
@@ -330,22 +443,22 @@
                 const userId = this.dataset.userId;
                 const userName = this.dataset.userName;
                 
-                if (confirm(`هل أنت متأكد من أنك تريد حذف المستخدم "${userName}"؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
+                if (confirm(`⚠️ هل أنت متأكد من أنك تريد حذف المستخدم "${userName}"؟\n\nهذا الإجراء لا يمكن التراجع عنه!`)) {
                     fetch(`/admin/users/${userId}`, {
                         method: 'DELETE'
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            alert('تم حذف المستخدم بنجاح');
+                            alert('✅ تم حذف المستخدم بنجاح');
                             location.reload();
                         } else {
-                            alert('فشل في حذف المستخدم: ' + data.message);
+                            alert('❌ فشل في حذف المستخدم: ' + data.message);
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('حدث خطأ أثناء حذف المستخدم');
+                        alert('❌ حدث خطأ أثناء حذف المستخدم');
                     });
                 }
             });

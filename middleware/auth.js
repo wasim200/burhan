@@ -83,20 +83,60 @@ exports.protect = async (req, res, next) => {
 // التحقق من صلاحية الاشتراك
 exports.requireActiveSubscription = async (req, res, next) => {
   try {
-    if (req.user.subscription.status !== 'active') {
-      // إذا كان الطلب HTML (وليس API/AJAX)، وجه المستخدم لصفحة قيد المراجعة
+    // التحقق من انتهاء صلاحية الاشتراك بناءً على endDate
+    if (req.user.subscription.endDate) {
+      const now = new Date();
+      const endDate = new Date(req.user.subscription.endDate);
+      
+      // إذا انتهت المدة، تحديث الحالة
+      if (now > endDate && req.user.subscription.status === 'active') {
+        req.user.subscription.status = 'expired';
+        await req.user.save();
+        console.log(`⏰ Subscription expired for user: ${req.user.username}`);
+      }
+    }
+    
+    // التحقق من حالة الاشتراك
+    const subscriptionStatus = req.user.subscription.status;
+    
+    if (subscriptionStatus !== 'active') {
+      console.log(`⚠️ User ${req.user.username} subscription status: ${subscriptionStatus}`);
+      
+      // إذا كان الطلب HTML، وجه حسب الحالة
       if (req.accepts(['html', 'json']) === 'html') {
-        return res.redirect('/register/pending');
+        // حالة منتهي → صفحة انتهاء الاشتراك
+        if (subscriptionStatus === 'expired') {
+          console.log(`   → Redirecting to /subscription/expired`);
+          return res.redirect('/subscription/expired');
+        } 
+        // حالة غير نشط → صفحة المراجعة
+        else if (subscriptionStatus === 'inactive') {
+          console.log(`   → Redirecting to /register/pending (inactive)`);
+          return res.redirect('/register/pending');
+        }
+        // حالة قيد المراجعة → صفحة المراجعة
+        else if (subscriptionStatus === 'pending') {
+          console.log(`   → Redirecting to /register/pending (pending)`);
+          return res.redirect('/register/pending');
+        }
+        // أي حالة أخرى → صفحة المراجعة
+        else {
+          console.log(`   → Redirecting to /register/pending (unknown: ${subscriptionStatus})`);
+          return res.redirect('/register/pending');
+        }
       } else {
+        // رد JSON للـ API requests
         return res.status(403).json({
           success: false,
-          message: 'يجب أن يكون لديك اشتراك نشط للوصول إلى هذه الميزة'
+          message: 'يجب أن يكون لديك اشتراك نشط للوصول إلى هذه الميزة',
+          status: subscriptionStatus
         });
       }
     }
+    
     next();
   } catch (error) {
-    // في حالة الخطأ، أعد توجيه المستخدم لصفحة المراجعة إذا كان HTML
+    console.log('❌ requireActiveSubscription error:', error);
     if (req.accepts(['html', 'json']) === 'html') {
       return res.redirect('/register/pending');
     } else {

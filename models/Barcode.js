@@ -26,6 +26,15 @@ const BarcodeSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  // صورة الوثيقة (اختياري)
+  documentImage: {
+    type: String,  // سيتم تخزين الصورة كـ base64 أو مسار الملف
+    required: false
+  },
+  documentImageName: {
+    type: String,  // اسم الملف الأصلي
+    required: false
+  },
   timestamp: {
     type: Date,
     default: Date.now

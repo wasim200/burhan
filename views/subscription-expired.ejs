@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>انتهاء فترة الاشتراك - نظام التوقيع الرقمي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .expired-wrapper {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 15px;
+        }
+        .expired-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+            animation: scaleUp 0.5s ease-out;
+        }
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .expired-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .expired-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .expired-header h1 {
+            font-size: 2rem;
+            margin: 0;
+            font-weight: 700;
+        }
+        .expired-header p {
+            font-size: 1.1rem;
+            margin: 10px 0 0;
+            opacity: 0.95;
+        }
+        .expired-body {
+            padding: 40px 30px;
+        }
+        .info-box {
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .info-box h3 {
+            color: #856404;
+            margin: 0 0 15px;
+            font-size: 1.3rem;
+        }
+        .info-box p {
+            color: #856404;
+            margin: 0;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px;
+        }
+        .features-list li {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+        .features-list li:hover {
+            background: #e9ecef;
+            transform: translateX(-5px);
+        }
+        .features-list li i {
+            font-size: 24px;
+            color: #667eea;
+        }
+        .contact-section {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        .contact-section h3 {
+            margin: 0 0 20px;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+        .contact-info {
+            display: grid;
+            gap: 15px;
+        }
+        .contact-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+        .contact-item i {
+            font-size: 28px;
+            color: #4ade80;
+        }
+        .contact-item .contact-label {
+            font-size: 13px;
+            opacity: 0.8;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .contact-item .contact-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .contact-item a {
+            color: white;
+            text-decoration: none;
+        }
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-custom {
+            padding: 15px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary-custom {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary-custom:hover {
+            background: #5a6268;
+            transform: translateY(-3px);
+        }
+        @media (max-width: 576px) {
+            .expired-header h1 {
+                font-size: 1.5rem;
+            }
+            .expired-icon {
+                font-size: 60px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-custom {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="expired-wrapper">
+        <div class="expired-card">
+            <!-- Header -->
+            <div class="expired-header">
+                <div class="expired-icon">
+                    <i class="fas fa-hourglass-end"></i>
+                </div>
+                <h1>انتهت فترة اشتراكك</h1>
+                <p>يؤسفنا إبلاغك بانتهاء فترة استخدامك للنظام</p>
+            </div>
+
+            <!-- Body -->
+            <div class="expired-body">
+                <!-- Info Box -->
+                <div class="info-box">
+                    <h3><i class="fas fa-info-circle me-2"></i>ماذا يعني هذا؟</h3>
+                    <p>
+                        لقد انتهت فترة صلاحية اشتراكك في نظام <strong>بٌـرهــان</strong> للتوقيع الرقمي.
+                        <br>
+                        لاستعادة الوصول إلى خدمات النظام، يرجى التواصل مع الإدارة لتجديد الاشتراك.
+                    </p>
+                </div>
+
+                <!-- Features Lost -->
+                <h4 class="mb-3" style="color: #667eea; text-align: center;">
+                    <i class="fas fa-lock me-2"></i>
+                    الخدمات المتوقفة حالياً:
+                </h4>
+                <ul class="features-list">
+                    <li>
+                        <i class="fas fa-qrcode"></i>
+                        <span>إنشاء باركودات مشفرة جديدة</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-camera"></i>
+                        <span>قراءة ومسح الباركودات</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-list"></i>
+                        <span>عرض قائمة الباركودات</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-shield-alt"></i>
+                        <span>التحقق من صحة الوثائق</span>
+                    </li>
+                </ul>
+
+                <!-- Contact Section -->
+                <div class="contact-section">
+                    <h3>
+                        <i class="fas fa-headset me-2"></i>
+                        تواصل معنا لتجديد الاشتراك
+                    </h3>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <span class="contact-label">البريد الإلكتروني</span>
+                                <span class="contact-value">
+                                    <a href="mailto:support@burhan-signature.com">support@burhan-signature.com</a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <span class="contact-label">الهاتف</span>
+                                <span class="contact-value">
+                                    <a href="tel:+966500000000">+966 50 000 0000</a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fab fa-whatsapp"></i>
+                            <div>
+                                <span class="contact-label">واتساب</span>
+                                <span class="contact-value">
+                                    <a href="https://wa.me/966500000000" target="_blank">+966 50 000 0000</a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="btn-group">
+                    <a href="mailto:support@burhan-signature.com" class="btn-custom btn-primary-custom">
+                        <i class="fas fa-paper-plane"></i>
+                        إرسال طلب تجديد
+                    </a>
+                    <a href="/logout" class="btn-custom btn-secondary-custom">
+                        <i class="fas fa-sign-out-alt"></i>
+                        تسجيل الخروج
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

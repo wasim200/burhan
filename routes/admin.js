@@ -68,12 +68,37 @@ router.get('/users', async (req, res) => {
       .limit(limit)
       .skip((page - 1) * limit);
     
+    // حساب الأيام المتبقية لكل مستخدم
+    const usersWithStats = users.map(user => {
+      let daysRemaining = 0;
+      let status = user.subscription.status;
+      
+      if (user.subscription.endDate) {
+        const endDate = new Date(user.subscription.endDate);
+        const today = new Date();
+        const diffTime = endDate - today;
+        daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        // تحديث الحالة إذا انتهت المدة
+        if (daysRemaining <= 0 && status === 'active') {
+          status = 'expired';
+          daysRemaining = 0;
+        }
+      }
+      
+      return {
+        ...user.toObject(),
+        daysRemaining,
+        status
+      };
+    });
+    
     const totalUsers = await User.countDocuments(query);
     const totalPages = Math.ceil(totalUsers / limit);
     
     res.render('admin/users', {
       user: req.user,
-      users,
+      users: usersWithStats,
       currentPage: page,
       totalPages,
       search,
@@ -107,6 +132,60 @@ router.post('/users/:id/status', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'فشل في تحديث حالة المستخدم'
+    });
+  }
+});
+
+// تفعيل المستخدم وتحديد مدة الاشتراك
+router.post('/users/:id/activate', async (req, res) => {
+  try {
+    const { durationDays } = req.body;
+    
+    if (!durationDays || durationDays < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'يرجى تحديد مدة صالحة للاشتراك'
+      });
+    }
+    
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + parseInt(durationDays));
+    
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { 
+        'subscription.status': 'active',
+        'subscription.startDate': startDate,
+        'subscription.endDate': endDate
+      },
+      { new: true }
+    );
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'المستخدم غير موجود'
+      });
+    }
+    
+    console.log(`✅ User ${user.username} activated for ${durationDays} days`);
+    
+    res.json({
+      success: true,
+      message: `تم تفعيل المستخدم لمدة ${durationDays} يوم`,
+      data: {
+        username: user.username,
+        status: user.subscription.status,
+        startDate: user.subscription.startDate,
+        endDate: user.subscription.endDate
+      }
+    });
+  } catch (error) {
+    console.error('Error activating user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'فشل في تفعيل المستخدم'
     });
   }
 });

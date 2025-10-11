@@ -202,6 +202,12 @@ app.get('/register/pending', (req, res) => {
   res.render('register/pending', { user: res.locals.user });
 });
 
+// صفحة انتهاء الاشتراك
+app.get('/subscription/expired', requireAuth, (req, res) => {
+  res.locals.currentPage = 'subscription-expired';
+  res.render('subscription-expired', { user: res.locals.user });
+});
+
 // صفحة شروط الاستخدام
 app.get('/terms', (req, res) => {
   res.locals.currentPage = 'terms';
