@@ -5,21 +5,24 @@ const User = require('../models/User');
 exports.protect = async (req, res, next) => {
   try {
     let token;
+    
+    // تجنب السجلات للطلبات المتكررة (notification polling)
+    const isQuietRequest = req.url.includes('/notifications/unread-count');
 
     // التحقق من وجود التوكن في الرأس
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
-      console.log('✅ protect: token found in Authorization header');
+      if (!isQuietRequest) console.log('✅ protect: token found in Authorization header');
     }
     // أو التحقق من وجود التوكن في الكوكيز (الان يتم تعيينه في /login)
     else if (req.cookies && req.cookies.token) {
       token = req.cookies.token;
-      console.log('✅ protect: token found in cookie');
+      if (!isQuietRequest) console.log('✅ protect: token found in cookie');
     }
     // أو التحقق من وجود التوكن في الجلسة (fallback)
     else if (req.session && req.session.token) {
       token = req.session.token;
-      console.log('✅ protect: token found in session');
+      if (!isQuietRequest) console.log('✅ protect: token found in session');
     }
 
     // التأكد من وجود التوكن
@@ -43,7 +46,7 @@ exports.protect = async (req, res, next) => {
     try {
       // التحقق من صحة التوكن
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_jwt_secret');
-      console.log('✅ protect: decoded token id=', decoded && decoded.id);
+      if (!isQuietRequest) console.log('✅ protect: decoded token id=', decoded && decoded.id);
       
       // الحصول على بيانات المستخدم من التوكن
       req.user = await User.findById(decoded.id);
@@ -56,7 +59,7 @@ exports.protect = async (req, res, next) => {
         });
       }
       
-      console.log('✅ protect: user authenticated:', req.user.username);
+      if (!isQuietRequest) console.log('✅ protect: user authenticated:', req.user.username);
       next();
     } catch (error) {
       console.log('❌ protect: token verification failed:', error.message);
