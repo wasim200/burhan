@@ -177,6 +177,9 @@ const imageScanner = {
     fileInfo: document.getElementById('fileInfo'),
     fileName: document.getElementById('fileName'),
     clearBtn: document.getElementById('clearFileBtn'),
+    changeImageBtn: document.getElementById('changeImageBtn'),
+    imagePreviewContainer: document.getElementById('imagePreviewContainer'),
+    imagePreview: document.getElementById('imagePreview'),
     statusEl: document.getElementById('imageStatus'),
     selectedFile: null,
     
@@ -185,6 +188,7 @@ const imageScanner = {
         this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
         this.scanBtn.addEventListener('click', () => this.scanImage());
         this.clearBtn.addEventListener('click', () => this.clearFile());
+        this.changeImageBtn.addEventListener('click', () => this.changeImage());
         
         // Drag and drop
         this.uploadArea.addEventListener('dragover', (e) => {
@@ -217,16 +221,44 @@ const imageScanner = {
         
         this.selectedFile = file;
         this.fileName.textContent = file.name;
+        
+        // عرض معاينة الصورة
+        this.showImagePreview(file);
+        
         this.fileInfo.style.display = 'block';
-        this.scanBtn.disabled = false;
         this.clearStatus();
+    },
+    
+    showImagePreview(file) {
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+            this.imagePreview.src = e.target.result;
+            this.uploadArea.style.display = 'none';
+            this.fileInfo.style.display = 'none';
+            this.imagePreviewContainer.classList.add('active');
+            console.log('✅ Image preview loaded successfully');
+        };
+        
+        reader.onerror = () => {
+            this.setStatus('❌ فشل تحميل معاينة الصورة', 'error');
+            console.error('Failed to load image preview');
+        };
+        
+        reader.readAsDataURL(file);
+    },
+    
+    changeImage() {
+        this.fileInput.click();
     },
     
     clearFile() {
         this.selectedFile = null;
         this.fileInput.value = '';
         this.fileInfo.style.display = 'none';
-        this.scanBtn.disabled = true;
+        this.imagePreviewContainer.classList.remove('active');
+        this.uploadArea.style.display = 'block';
+        this.imagePreview.src = '';
         this.clearStatus();
     },
     

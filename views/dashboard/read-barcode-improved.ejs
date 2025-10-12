@@ -113,6 +113,35 @@
             border-radius: 6px;
             display: none;
         }
+        .image-preview-container {
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+        .image-preview-container.active {
+            display: block;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 3px solid #007bff;
+            object-fit: contain;
+            background: #f8f9fa;
+        }
+        .preview-header {
+            margin-bottom: 15px;
+            color: #136d62;
+            font-weight: 600;
+        }
+        .preview-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
@@ -212,10 +241,20 @@
                             </button>
                         </div>
                         
-                        <div class="text-center mt-3">
-                            <button id="scanImageBtn" type="button" class="btn btn-primary btn-lg" disabled>
-                                <i class="fas fa-search me-2"></i>تحليل الصورة
-                            </button>
+                        <!-- معاينة الصورة -->
+                        <div class="image-preview-container" id="imagePreviewContainer">
+                            <div class="preview-header">
+                                <i class="fas fa-eye me-2"></i>معاينة الصورة المختارة
+                            </div>
+                            <img id="imagePreview" class="image-preview" alt="معاينة الصورة">
+                            <div class="preview-actions">
+                                <button id="scanImageBtn" type="button" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-search me-2"></i>تحليل الصورة
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-lg" id="changeImageBtn">
+                                    <i class="fas fa-sync-alt me-2"></i>تغيير الصورة
+                                </button>
+                            </div>
                         </div>
                         
                         <div id="imageStatus"></div>
