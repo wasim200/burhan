@@ -17,6 +17,7 @@ const adminRoutes = require('./routes/admin');
 const barcodeRoutes = require('./routes/barcode');
 const bankTransferRoutes = require('./routes/bankTransfer');
 const paymentRoutes = require('./routes/payment');
+const notificationsRoutes = require('./routes/notifications');
 const User = require('./models/User');
 
 // تهيئة التطبيق
@@ -555,6 +556,7 @@ app.get('/logout', (req, res) => {
 app.use('/dashboard', requireActiveSubscription, dashboardRoutes);
 app.use('/admin', requireAdmin, adminRoutes);
 app.use('/barcode', requireActiveSubscription, barcodeRoutes);
+app.use('/notifications', notificationsRoutes);
 app.use('/api/bank-transfer', bankTransferRoutes);
 
 // التعامل مع الأخطاء 404
@@ -582,6 +584,10 @@ process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
   process.exit(1);
 });
+
+// تشغيل المهام المجدولة
+const { startScheduledTasks } = require('./utils/scheduledTasks');
+startScheduledTasks();
 
 // تشغيل الخادم
 const PORT = process.env.PORT || 3000;

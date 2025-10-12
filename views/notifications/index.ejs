@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإشعارات - بٌـرهــان</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .notifications-wrapper {
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        .notifications-header {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(19, 109, 98, 0.3);
+        }
+        .notification-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-right: 4px solid transparent;
+            position: relative;
+        }
+        .notification-card:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        .notification-card.unread {
+            background: #e7f3ff;
+            border-right-color: #136d62;
+        }
+        .notification-card.unread::after {
+            content: 'جديد';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #dc3545;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .notification-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-left: 15px;
+        }
+        .notification-icon.subscription {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            color: white;
+        }
+        .notification-icon.barcode {
+            background: linear-gradient(135deg, #136d62, #0a4d45);
+            color: white;
+        }
+        .notification-icon.system {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .notification-icon.warning {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+        .notification-icon.info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+        .notification-content {
+            flex: 1;
+        }
+        .notification-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #136d62;
+        }
+        .notification-message {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .notification-time {
+            font-size: 12px;
+            color: #999;
+        }
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+        }
+        .empty-state i {
+            font-size: 80px;
+            color: #e9ecef;
+            margin-bottom: 20px;
+        }
+        .priority-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .priority-urgent {
+            background: #dc3545;
+            color: white;
+        }
+        .priority-high {
+            background: #ffc107;
+            color: #856404;
+        }
+        .priority-medium {
+            background: #17a2b8;
+            color: white;
+        }
+        .priority-low {
+            background: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', {currentPage: 'notifications', user: user}) %>
+    
+    <div class="notifications-wrapper">
+        <div class="container">
+            <!-- Header -->
+            <div class="notifications-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <h1 class="h3 mb-2">
+                            <i class="fas fa-bell me-2"></i>
+                            الإشعارات
+                        </h1>
+                        <p class="mb-0" style="opacity: 0.95;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            لديك <%= unreadCount %> إشعار غير مقروء من أصل <%= total %>
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-success" id="refreshBtn" title="تحديث الإشعارات">
+                            <i class="fas fa-sync-alt me-2"></i>تحديث
+                        </button>
+                        <% if (unreadCount > 0) { %>
+                        <button class="btn btn-light" id="markAllReadBtn">
+                            <i class="fas fa-check-double me-2"></i>تعليم الكل كمقروء
+                        </button>
+                        <% } %>
+                        <button class="btn btn-outline-light" id="deleteReadBtn">
+                            <i class="fas fa-trash me-2"></i>حذف المقروءة
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications List -->
+            <% if (notifications.length > 0) { %>
+                <div id="notificationsList">
+                    <% notifications.forEach(notification => { %>
+                        <div class="notification-card <%= notification.isRead ? '' : 'unread' %>" data-id="<%= notification._id %>">
+                            <div class="d-flex">
+                                <div class="notification-icon <%= notification.type %>">
+                                    <i class="fas <%= notification.icon %>"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="notification-title">
+                                            <%= notification.title %>
+                                        </div>
+                                        <% if (notification.priority && notification.priority !== 'low') { %>
+                                        <span class="priority-badge priority-<%= notification.priority %>">
+                                            <%= notification.priority === 'urgent' ? '🔥 عاجل' : notification.priority === 'high' ? '⚠️ هام' : 'متوسط' %>
+                                        </span>
+                                        <% } %>
+                                    </div>
+                                    <div class="notification-message">
+                                        <%= notification.message %>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <div class="notification-time">
+                                            <i class="fas fa-clock me-1"></i>
+                                            <%= new Date(notification.createdAt).toLocaleString('ar-SA', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            }) %>
+                                        </div>
+                                        <div class="notification-actions">
+                                            <% if (!notification.isRead) { %>
+                                            <button class="btn btn-sm btn-success mark-read-btn" data-id="<%= notification._id %>">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <% } %>
+                                            <% if (notification.link) { %>
+                                            <a href="<%= notification.link %>" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                            <% } %>
+                                            <button class="btn btn-sm btn-danger delete-btn" data-id="<%= notification._id %>">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                <nav aria-label="Pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                <a class="page-link" href="/notifications?page=<%= i %>"><%= i %></a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </nav>
+                <% } %>
+            <% } else { %>
+                <div class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <h3>لا توجد إشعارات</h3>
+                    <p class="text-muted">لم تتلق أي إشعارات بعد</p>
+                    <a href="/dashboard" class="btn btn-primary mt-3">
+                        <i class="fas fa-home me-2"></i>العودة إلى لوحة التحكم
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        // Mark notification as read
+        document.querySelectorAll('.mark-read-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const id = this.dataset.id;
+                try {
+                    const response = await fetch(`/notifications/${id}/read`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    if (response.ok) {
+                        location.reload();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        // Mark all as read
+        document.getElementById('markAllReadBtn')?.addEventListener('click', async function() {
+            if (confirm('تعليم جميع الإشعارات كمقروءة؟')) {
+                try {
+                    const response = await fetch('/notifications/mark-all-read', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    if (response.ok) {
+                        location.reload();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        });
+
+        // Delete notification
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const id = this.dataset.id;
+                if (confirm('هل تريد حذف هذا الإشعار؟')) {
+                    try {
+                        const response = await fetch(`/notifications/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        if (response.ok) {
+                            document.querySelector(`[data-id="${id}"]`).remove();
+                            location.reload();
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+            });
+        });
+
+        // Delete read notifications
+        document.getElementById('deleteReadBtn')?.addEventListener('click', async function() {
+            if (confirm('حذف جميع الإشعارات المقروءة؟')) {
+                try {
+                    const response = await fetch('/notifications', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    if (response.ok) {
+                        location.reload();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        });
+
+        // Refresh notifications
+        document.getElementById('refreshBtn')?.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            icon.classList.add('fa-spin');
+            
+            // تحديث Badge في Header فوراً
+            if (typeof window.refreshNotifications === 'function') {
+                window.refreshNotifications();
+            }
+            
+            // إعادة تحميل الصفحة بعد ثانية
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        });
+
+        // Auto-refresh page when it becomes visible (للحصول على إشعارات جديدة)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // تحديث Badge فقط دون إعادة تحميل
+                if (typeof window.refreshNotifications === 'function') {
+                    window.refreshNotifications();
+                }
+            }
+        });
+    </script>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

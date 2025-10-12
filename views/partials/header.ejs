@@ -33,6 +33,12 @@
               <li class="nav-item"><a class="nav-link <%= (currentPage === 'barcode-list') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/barcode/list"><i class="fas fa-qrcode me-2"></i>الباركودات</a></li>
               <li class="nav-item"><a class="nav-link <%= (currentPage === 'read-barcode') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/barcode/read"><i class="fas fa-camera me-2"></i>قراءة باركود</a></li>
               <li class="nav-item"><a class="nav-link <%= (currentPage === 'subscription') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/dashboard/subscription"><i class="fas fa-crown me-2"></i>الاشتراك</a></li>
+              <li class="nav-item position-relative">
+                <a class="nav-link <%= (currentPage === 'notifications') ? 'active bg-white bg-opacity-10 rounded' : '' %>" href="/notifications" id="notificationsLink">
+                  <i class="fas fa-bell me-2"></i>الإشعارات
+                  <span class="badge bg-danger rounded-pill position-absolute top-0 start-0 translate-middle" id="notificationBadge" style="display: none; font-size: 10px;">0</span>
+                </a>
+              </li>
               <li class="nav-item"><a class="nav-link" href="/profile/view"><i class="fas fa-user-circle me-2"></i>الملف الشخصي</a></li>
               <li class="nav-item"><a class="nav-link" href="/profile"><i class="fas fa-user-edit me-2"></i>تعديل الملف</a></li>
               <% if (user && user.role === 'admin') { %>
@@ -88,6 +94,31 @@
   /* Ensure smooth scrolling */
   html {
     scroll-behavior: smooth;
+  }
+  
+  /* Notification badge animation */
+  @keyframes pulse {
+    0% {
+      transform: translate(-50%, -50%) scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(1.2);
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+  }
+  
+  #notificationBadge {
+    min-width: 18px;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
   }
   </style>
 
@@ -151,5 +182,59 @@
       });
     }
   })();
+
+  // Update notification badge
+  <% if (user) { %>
+  (function() {
+    async function updateNotificationBadge() {
+      try {
+        const response = await fetch('/notifications/unread-count');
+        const data = await response.json();
+        
+        const badge = document.getElementById('notificationBadge');
+        if (badge) {
+          if (data.success && data.count > 0) {
+            badge.textContent = data.count > 99 ? '99+' : data.count;
+            badge.style.display = 'inline-block';
+            
+            // إضافة تأثير بصري عند ظهور Badge لأول مرة
+            if (badge.dataset.firstShow !== 'true') {
+              badge.style.animation = 'pulse 0.5s ease-in-out';
+              badge.dataset.firstShow = 'true';
+            }
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching notification count:', error);
+      }
+    }
+    
+    // تحديث فوري عند تحميل الصفحة (بعد 300ms للتأكد من تحميل DOM)
+    setTimeout(updateNotificationBadge, 300);
+    
+    // تحديث ثاني سريع بعد ثانية واحدة (للتأكد)
+    setTimeout(updateNotificationBadge, 1000);
+    
+    // Update every 5 seconds (تحديث مستمر)
+    setInterval(updateNotificationBadge, 5000);
+    
+    // Update when user returns to the page (tab becomes visible)
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        updateNotificationBadge();
+      }
+    });
+    
+    // Update when window gains focus
+    window.addEventListener('focus', function() {
+      updateNotificationBadge();
+    });
+    
+    // Expose function globally for manual refresh
+    window.refreshNotifications = updateNotificationBadge;
+  })();
+  <% } %>
   </script>
 </header>

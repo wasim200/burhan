@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { protect, authorize } = require('../middleware/auth');
+const { createWelcomeNotification } = require('../utils/notificationHelper');
 const router = express.Router();
 
 // إنشاء توكن JWT
@@ -65,6 +66,17 @@ router.post('/register', async (req, res) => {
       password
     });
 
+    console.log('✅ User created:', user.username, 'ID:', user._id);
+
+    // إنشاء إشعار ترحيبي
+    try {
+      await createWelcomeNotification(user._id);
+      console.log('✅ Welcome notification created successfully');
+    } catch (notifError) {
+      console.error('⚠️ Failed to create welcome notification:', notifError);
+      // لا نوقف التسجيل بسبب فشل الإشعار
+    }
+
     // تخزين بيانات المستخدم في الجلسة
     req.session.userId = user._id;
     req.session.username = user.username;
@@ -72,6 +84,7 @@ router.post('/register', async (req, res) => {
 
     sendTokenResponse(user, 201, res);
   } catch (error) {
+    console.error('❌ Error in user registration:', error);
     res.status(500).json({
       success: false,
       message: 'خطأ في إنشاء الحساب',

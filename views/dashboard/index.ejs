@@ -175,6 +175,69 @@
                 </p>
             </div>
 
+            <!-- Subscription Status Alert -->
+            <% if (user.subscription && user.subscription.endDate) { 
+                const today = new Date();
+                const endDate = new Date(user.subscription.endDate);
+                const diffTime = endDate - today;
+                const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                let alertClass = '';
+                let alertIcon = '';
+                let alertTitle = '';
+                let alertMessage = '';
+                
+                if (daysRemaining > 30) {
+                    alertClass = 'success';
+                    alertIcon = 'fa-check-circle';
+                    alertTitle = 'اشتراكك نشط';
+                    alertMessage = `لديك ${daysRemaining} يوم متبقي من اشتراكك`;
+                } else if (daysRemaining > 7) {
+                    alertClass = 'warning';
+                    alertIcon = 'fa-exclamation-triangle';
+                    alertTitle = 'تنبيه: اشتراكك سينتهي قريباً';
+                    alertMessage = `تبقى ${daysRemaining} يوم فقط على انتهاء اشتراكك. يرجى التواصل مع الإدارة للتجديد`;
+                } else if (daysRemaining > 0) {
+                    alertClass = 'danger';
+                    alertIcon = 'fa-hourglass-end';
+                    alertTitle = 'عاجل: اشتراكك سينتهي خلال أيام!';
+                    alertMessage = `تبقى ${daysRemaining} يوم فقط! تواصل مع الإدارة فوراً للتجديد`;
+                } else {
+                    alertClass = 'dark';
+                    alertIcon = 'fa-times-circle';
+                    alertTitle = 'انتهى اشتراكك';
+                    alertMessage = 'اشتراكك منتهي. يرجى التواصل مع الإدارة للتجديد';
+                }
+            %>
+            <div class="alert alert-<%= alertClass %> alert-dismissible fade show" role="alert" style="border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 20px;">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="font-size: 40px;">
+                        <i class="fas <%= alertIcon %>"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading mb-2">
+                            <i class="fas fa-calendar-check me-2"></i><%= alertTitle %>
+                        </h5>
+                        <p class="mb-0" style="font-size: 15px;"><%= alertMessage %></p>
+                        <% if (daysRemaining <= 7) { %>
+                        <hr style="margin: 15px 0;">
+                        <div style="font-size: 14px;">
+                            <strong>تاريخ الانتهاء:</strong> <%= endDate.toLocaleDateString('ar-SA', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) %>
+                        </div>
+                        <% } %>
+                    </div>
+                    <% if (daysRemaining <= 30) { %>
+                    <div>
+                        <a href="mailto:support@burhan-signature.com" class="btn btn-light" style="white-space: nowrap;">
+                            <i class="fas fa-envelope me-2"></i>تواصل للتجديد
+                        </a>
+                    </div>
+                    <% } %>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <% } %>
+
             <!-- Stats Cards -->
             <div class="row g-3 mb-4">
                 <div class="col-6 col-md-3">

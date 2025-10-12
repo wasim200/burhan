@@ -218,6 +218,43 @@
 
             <!-- Body -->
             <div class="expired-body">
+                <!-- User Info -->
+                <% if (user) { %>
+                <div style="background: #e7f3ff; border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: 700;">
+                            <%= user.username.charAt(0).toUpperCase() %>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 20px; font-weight: 700; color: #136d62; margin-bottom: 5px;">
+                                <%= user.username %>
+                            </div>
+                            <div style="font-size: 14px; color: #6c757d;">
+                                <i class="fas fa-envelope me-1"></i><%= user.email %>
+                            </div>
+                        </div>
+                    </div>
+                    <% if (user.subscription && user.subscription.endDate) { %>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 2px dashed #136d62;">
+                        <div style="color: #dc3545; font-weight: 600; font-size: 15px;">
+                            <i class="fas fa-calendar-times me-2"></i>
+                            انتهى الاشتراك في: <%= new Date(user.subscription.endDate).toLocaleDateString('ar-SA', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) %>
+                        </div>
+                        <% 
+                            const today = new Date();
+                            const endDate = new Date(user.subscription.endDate);
+                            const daysPassed = Math.ceil((today - endDate) / (1000 * 60 * 60 * 24));
+                        %>
+                        <% if (daysPassed > 0) { %>
+                        <div style="color: #856404; font-size: 14px; margin-top: 5px;">
+                            منذ <%= daysPassed %> <%= daysPassed === 1 ? 'يوم' : 'أيام' %>
+                        </div>
+                        <% } %>
+                    </div>
+                    <% } %>
+                </div>
+                <% } %>
+                
                 <!-- Info Box -->
                 <div class="info-box">
                     <h3><i class="fas fa-info-circle me-2"></i>ماذا يعني هذا؟</h3>

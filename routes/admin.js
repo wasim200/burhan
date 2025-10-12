@@ -4,6 +4,7 @@ const User = require('../models/User');
 const BankTransfer = require('../models/BankTransfer');
 const Barcode = require('../models/Barcode');
 const { protect, authorize } = require('../middleware/auth');
+const { createSubscriptionActivatedNotification } = require('../utils/notificationHelper');
 
 // جميع routes تحتاج إلى مصادقة وتفويض كمسؤول
 // ملاحظة: middleware المصادقة يتم تطبيقه في app.js
@@ -170,6 +171,9 @@ router.post('/users/:id/activate', async (req, res) => {
     }
     
     console.log(`✅ User ${user.username} activated for ${durationDays} days`);
+    
+    // إنشاء إشعار للمستخدم
+    await createSubscriptionActivatedNotification(user._id, durationDays, endDate);
     
     res.json({
       success: true,
