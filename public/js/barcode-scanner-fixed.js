@@ -323,7 +323,7 @@ const imageScanner = {
         } catch (error3) {
             console.error('All methods failed:', error3);
             this.setStatus(
-                `❌ فشل قراءة رمز QR من الصورة بعد 3 محاولات.<br>` +
+                `❌ فشل قراءة رمز QR من الصورة .<br>` +
                 `التفاصيل: ${error3.message || 'غير معروف'}<br><br>` +
                 `💡 نصائح:<br>` +
                 `• تأكد من أن الصورة تحتوي على رمز QR واضح<br>` +
