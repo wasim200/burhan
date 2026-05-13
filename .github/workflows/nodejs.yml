@@ -1,0 +1,35 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - name: تحميل المشروع
+      uses: actions/checkout@v4
+
+    - name: تثبيت Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: تثبيت الحزم
+      run: npm install
+
+    - name: فحص المشروع
+      run: npm audit fix --force
+
+    - name: تشغيل التطبيق
+      run: node app.js
